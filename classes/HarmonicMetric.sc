@@ -47,7 +47,7 @@ HarmonicMetric {
 }
 
 /*
-	a–adir specific harmonicity
+	add specific harmonicity
 
 HarmonicMetric
 	abs (in case of harmonicity)

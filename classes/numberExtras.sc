@@ -265,13 +265,15 @@ USAGE:  a_prime.primeHarmonics(highest_harmonic)
 	// lowest common denominator
 	lcd { ^this.collect{|x| x[1] }.reduce(\lcm) }
 	
+	
+	// adapted from John Chalmers' "Divisions of the Tetrachord", chapter 2
 	katapykne {|n = 1| var ints = ((this[0] * n)..(this[1] * n)).reverse;
 		^(ints.size - 1).collect{|i|
 			[ ints[i+1], ints[i] ]
 		}.reverse
 	}
 	
-	katapykne_ab {|a, b| 
+	katapykne_ab {|a = 1, b = 2| 
 		^[
 			[(a+b) * this[0], (b*this[0]) + (a*this[1])].reduceRatio,
 			[(b*this[0]) + (a*this[1]), (a+b) * this[1]].reduceRatio

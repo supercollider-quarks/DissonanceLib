@@ -23,10 +23,11 @@ p.p13 {margin: 0.0px 0.0px 0.0px 0.0px; font: 11.0px Monaco; min-height: 15.0px}
 p.p14 {margin: 0.0px 0.0px 0.0px 0.0px; font: 10.0px Monaco}
 p.p15 {margin: 0.0px 0.0px 0.0px 0.0px; font: 19.0px 'Lucida Grande'}
 p.p16 {margin: 0.0px 0.0px 0.0px 0.0px; font: 16.0px Helvetica}
-p.p17 {margin: 0.0px 0.0px 0.0px 0.0px; font: 12.0px Helvetica; color: #008318}
-p.p18 {margin: 0.0px 0.0px 0.0px 0.0px; font: 17.0px Helvetica}
-p.p19 {margin: 0.0px 0.0px 0.0px 0.0px; font: 14.0px Helvetica; color: #002efa; min-height: 17.0px}
-p.p20 {margin: 0.0px 0.0px 0.0px 57.0px; text-indent: -57.0px; font: 9.0px Monaco}
+p.p17 {margin: 0.0px 0.0px 0.0px 57.0px; text-indent: -57.0px; font: 9.0px Monaco}
+p.p18 {margin: 0.0px 0.0px 0.0px 0.0px; font: 9.0px Monaco; color: #000000}
+p.p19 {margin: 0.0px 0.0px 0.0px 0.0px; font: 12.0px Helvetica; color: #008318}
+p.p20 {margin: 0.0px 0.0px 0.0px 0.0px; font: 17.0px Helvetica}
+p.p21 {margin: 0.0px 0.0px 0.0px 0.0px; font: 14.0px Helvetica; color: #002efa; min-height: 17.0px}
 span.s1 {font: 18.0px Helvetica}
 span.s2 {color: #002efa}
 span.s3 {font: 14.0px Helvetica; color: #002efa}
@@ -58,8 +59,9 @@ span.s28 {font: 21.0px Monaco}
 span.s29 {font: 18.0px 'Lucida Grande'}
 span.s30 {font: 17.0px 'Lucida Grande'}
 span.s31 {font: 23.0px 'Lucida Grande'}
-span.s32 {color: #018319}
-span.s33 {color: #008319}
+span.s32 {font: 14.0px Helvetica; color: #012efa}
+span.s33 {color: #018319}
+span.s34 {color: #008319}
 span.Apple-tab-span {white-space:pre}
 </style>
 </head>
@@ -350,10 +352,32 @@ span.Apple-tab-span {white-space:pre}
 <p class="p3"><span class="s3"><b><span class="Apple-tab-span">	</span></b></span>The lowest common denominator to an array of [p, q] ratios.</p>
 <p class="p6"><br></p>
 <p class="p7"><span class="Apple-tab-span">	</span><span class="Apple-tab-span">	</span>[[5,4], [4,3], [64,45]].lcd;</p>
-<p class="p7"><span class="Apple-tab-span">	</span><span class="Apple-tab-span">	</span>[[1,1], [9,8], [81,64]].lcd;</p>
+<p class="p17"><span class="Apple-tab-span">	</span><span class="Apple-tab-span">	</span>[[1,1], [9,8], [81,64]].lcd;</p>
 <p class="p7"><span class="Apple-tab-span">	</span><span class="Apple-tab-span">	</span>[[1,1], [9,8], [5,4]].lcd;</p>
 <p class="p7"><span class="Apple-tab-span">	</span><span class="Apple-tab-span">	</span>[[1,1], [9,8], [6,5]].lcd;</p>
+<p class="p6"><span class="Apple-tab-span">	</span><span class="Apple-tab-span">	</span></p>
+<p class="p5"><b>katapykne(n = 1)</b></p>
+<p class="p3"><span class="s32"><b><span class="Apple-tab-span">	</span></b></span>A method of densification of intervals used by ancient greek harmonists. See John Chalmers "Divisions of <span class="Apple-tab-span">	</span>the Tetrachord", Chapter 2: "Katapyknosis consists of the division, or rather the filling-in, of a musical<span class="Apple-converted-space"> </span></p>
+<p class="p3"><span class="Apple-tab-span">	</span>interval by multiplying its numerator and denominator by a set of integers of increasing magnitude ... The<span class="Apple-converted-space"> </span></p>
+<p class="p3"><span class="Apple-tab-span">	</span>intervals form a series of microtones which are then recombined to produce the desired melodic division,<span class="Apple-converted-space"> </span></p>
+<p class="p3"><span class="Apple-tab-span">	</span>usually composed of epimore [superparticular] ratios."</p>
+<p class="p3"><span class="Apple-tab-span">	</span>n is the number of levels of this process<span class="Apple-converted-space"> </span></p>
 <p class="p6"><br></p>
+<p class="p7"><span class="Apple-tab-span">	</span><span class="Apple-tab-span">	</span>[5,4].katapykne;</p>
+<p class="p18"><span class="Apple-tab-span">	</span><span class="Apple-tab-span">	</span>[5,4].katapykne(2);<span class="Apple-tab-span">	</span><span class="s7">// 10/9 * 9/8 = 5/4</span></p>
+<p class="p9"><span class="s10"><span class="Apple-tab-span">	</span><span class="Apple-tab-span">	</span>[5,4].katapykne(5);<span class="Apple-converted-space">    </span></span>// all those ratios divide 5/4 into epimore ratios</p>
+<p class="p18"><span class="Apple-tab-span">	</span><span class="Apple-tab-span">	</span>[5,4].katapykne(5).product.reduceRatio;<span class="Apple-tab-span">	</span><span class="s7">// that intervallicaly sum to 5/4<span class="Apple-converted-space"> </span></span></p>
+<p class="p6"><br></p>
+<p class="p5"><b>katapykne_ab(a = 1, b = 2)</b></p>
+<p class="p3"><span class="s32"><b><span class="Apple-tab-span">	</span></b></span>A variation on katapyknosis where the increment is not a simple arithmetic series by factors a and b.</p>
+<p class="p6"><br></p>
+<p class="p7"><span class="Apple-tab-span">	</span><span class="Apple-tab-span">	</span>[5,4].katapykne_ab(1,2)</p>
+<p class="p7"><span class="Apple-tab-span">	</span><span class="Apple-tab-span">	</span>[5,4].katapykne_ab(1,3)</p>
+<p class="p7"><span class="Apple-tab-span">	</span><span class="Apple-tab-span">	</span>[5,4].katapykne_ab(2,3)</p>
+<p class="p7"><span class="Apple-tab-span">	</span><span class="Apple-tab-span">	</span>[5,4].katapykne_ab(2,6)</p>
+<p class="p7"><span class="Apple-tab-span">	</span><span class="Apple-tab-span">	</span>[5,4].katapykne_ab(4,2)</p>
+<p class="p7"><span class="Apple-tab-span">	</span><span class="Apple-tab-span">	</span>[5,4].katapykne_ab(5,3)</p>
+<p class="p6"><span class="Apple-tab-span">	</span><span class="Apple-tab-span">	</span></p>
 <p class="p5"><b>ratioToFreq</b></p>
 <p class="p3"><span class="s3"><b><span class="Apple-tab-span">	</span></b></span>Express and array of [p, q] ratios as decimal frequency ratios.</p>
 <p class="p6"><span class="Apple-tab-span">	</span></p>
@@ -391,7 +415,7 @@ span.Apple-tab-span {white-space:pre}
 <p class="p3"><span class="Apple-tab-span">	</span>The <b>tolerance</b> (in cents) defines the range within which the search for intervals will be made.<span class="Apple-converted-space"> </span></p>
 <p class="p2"><span class="Apple-tab-span">	</span></p>
 <p class="p3"><span class="Apple-tab-span">	</span>The <b>metric</b> is either an instance of <a href="../Help/HarmonicMetric.html"><span class="s2">HarmonicMetric</span></a><span class="s2"> </span>or a symbol:<span class="Apple-converted-space"> </span></p>
-<p class="p17"><span class="s10"><span class="Apple-tab-span">	</span><span class="Apple-tab-span">	</span><span class="Apple-tab-span">	</span></span>\harmonicity<span class="s10">, </span>\harmonicDistance<span class="s10"> or </span>\gradusSuavitatis<span class="s10"><span class="Apple-tab-span">	</span></span></p>
+<p class="p19"><span class="s10"><span class="Apple-tab-span">	</span><span class="Apple-tab-span">	</span><span class="Apple-tab-span">	</span></span>\harmonicity<span class="s10">, </span>\harmonicDistance<span class="s10"> or </span>\gradusSuavitatis<span class="s10"><span class="Apple-tab-span">	</span></span></p>
 <p class="p3"><span class="Apple-tab-span">	</span>If no metric is specified, <span class="s25">\harmonicity</span> will be used. See below for more on harmonic measures.<span class="Apple-converted-space"> </span></p>
 <p class="p2"><span class="Apple-tab-span">	</span></p>
 <p class="p3"><span class="Apple-tab-span">	</span>The <b>type</b> is either <span class="s25">\size</span> or <span class="s25">\prime. </span>If <span class="s25">\size</span> is chosen, intervals in the table with numerator and denominator<span class="Apple-converted-space"> </span></p>
@@ -405,11 +429,11 @@ span.Apple-tab-span {white-space:pre}
 <p class="p9"><span class="s10"><span class="Apple-tab-span">	</span></span>// notice how the second interval (a pythagorean ditone) is interpreted differently<span class="Apple-converted-space"> </span></p>
 <p class="p9"><span class="s10"><span class="Apple-tab-span">	</span></span>// according to metric (and tolerance):<span class="Apple-tab-span">	</span></p>
 <p class="p7"><span class="Apple-tab-span">	</span><span class="Apple-tab-span">	</span>[1.125, 1.265625, 1.333, 1.36].rationalize(12, <span class="s25">\harmonicDistance</span>);<span class="Apple-tab-span">	</span></p>
-<p class="p7"><span class="Apple-tab-span">	</span><span class="Apple-tab-span">	</span>[1.125, 1.265625, 1.333, 1.36].rationalize(12, <span class="s32">\harmonicity</span>);</p>
-<p class="p7"><span class="Apple-tab-span">	</span><span class="Apple-tab-span">	</span>[1.125, 1.265625, 1.333, 1.36].rationalize(12, <span class="s32">\gradusSuavitatis</span>);</p>
+<p class="p7"><span class="Apple-tab-span">	</span><span class="Apple-tab-span">	</span>[1.125, 1.265625, 1.333, 1.36].rationalize(12, <span class="s33">\harmonicity</span>);</p>
+<p class="p7"><span class="Apple-tab-span">	</span><span class="Apple-tab-span">	</span>[1.125, 1.265625, 1.333, 1.36].rationalize(12, <span class="s33">\gradusSuavitatis</span>);</p>
 <p class="p6"><br></p>
 <p class="p7"><span class="Apple-tab-span">	</span><span class="Apple-tab-span">	</span>[1.125, 1.333, 1.37, 1.67, 1.897].rationalize(21, <span class="s25">\harmonicity</span>, <span class="s25">\prime</span>, 7);</p>
-<p class="p7"><span class="Apple-tab-span">	</span><span class="Apple-tab-span">	</span>[1.125, 1.333, 1.37, 1.67, 1.897].rationalize(21, <span class="s33">\gradusSuavitatis</span>, <span class="s33">\prime</span>, 11);</p>
+<p class="p7"><span class="Apple-tab-span">	</span><span class="Apple-tab-span">	</span>[1.125, 1.333, 1.37, 1.67, 1.897].rationalize(21, <span class="s34">\gradusSuavitatis</span>, <span class="s34">\prime</span>, 11);</p>
 <p class="p6"><span class="Apple-tab-span">	</span><span class="Apple-tab-span">	</span></p>
 <p class="p9"><span class="s10"><span class="Apple-tab-span">	</span></span>// irrational numbers phi, e &amp; pi, compare:<span class="Apple-converted-space"> </span></p>
 <p class="p7"><span class="Apple-tab-span">	</span><span class="Apple-tab-span">	</span>[(1 + 5.sqrt)/2, 1.exp, pi ].rationalize;<span class="Apple-tab-span">	</span><span class="Apple-tab-span">	</span><span class="s7">// phi as 45/28</span></p>
@@ -450,7 +474,7 @@ span.Apple-tab-span {white-space:pre}
 <p class="p6"><br></p>
 <p class="p6"><span class="Apple-tab-span">	</span><span class="Apple-converted-space"> </span></p>
 <p class="p6"><br></p>
-<p class="p18"><b>Harmonic measures</b></p>
+<p class="p20"><b>Harmonic measures</b></p>
 <p class="p3"><span class="s3"><b><span class="Apple-tab-span">	</span></b></span>There are 3 main harmonic measures implemented in DissonanceLib. See <a href="../Help/HarmonicMetric.html"><span class="s2">HarmonicMetric</span></a> for more info.</p>
 <p class="p2"><span class="Apple-tab-span">	</span></p>
 <p class="p5"><b>harmonicity<span class="Apple-converted-space"> </span></b></p>
@@ -483,8 +507,8 @@ span.Apple-tab-span {white-space:pre}
 <p class="p7"><span class="Apple-tab-span">	</span><span class="Apple-tab-span">	</span>[4,5,6,7].harmonicsToRatios.gradusSuavitatisN;<span class="Apple-tab-span">	</span></p>
 <p class="p2"><span class="Apple-tab-span">	</span></p>
 <p class="p2"><span class="Apple-tab-span">	</span></p>
-<p class="p18"><b>Convenience methods</b></p>
-<p class="p19"><b><span class="Apple-tab-span">	</span></b></p>
+<p class="p20"><b>Convenience methods</b></p>
+<p class="p21"><b><span class="Apple-tab-span">	</span></b></p>
 <p class="p3">The following are designed to work with arrays of pairs of frecuencies and intensities [freq, spl]:</p>
 <p class="p4"><b>asPhon</b></p>
 <p class="p3"><span class="s3"><b><span class="Apple-tab-span">	</span></b></span>Return the values in phons of arrays of [freq, spl] pairs.</p>
@@ -519,7 +543,7 @@ span.Apple-tab-span {white-space:pre}
 <p class="p6"><br></p>
 <p class="p7"><span class="Apple-tab-span">	</span><span class="Apple-tab-span">	</span>[1,2,3,4,3,6,3,7].removeDuplicates</p>
 <p class="p6"><span class="Apple-tab-span">	</span></p>
-<p class="p20">...</p>
-<p class="p20">(c) 2005-2010, jsl</p>
+<p class="p17">...</p>
+<p class="p17">(c) 2005-2010, jsl</p>
 </body>
 </html>

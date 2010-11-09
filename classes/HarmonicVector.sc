@@ -24,16 +24,15 @@ HarmonicVector{
 		this.cents.round(0.01) << "¢ )";
 	}		
 	
-	full { // post all info on the vector
-		^[	vector.asArray.asString, 
-			this.formatRatio(ratio), 
-			reduced.asString, 
-			this.formatRatio(reducedRatio), 
-			this.cents.round(0.01)
-		].asString
-	}
-	
-	formatRatio {|r| ^r[0].asString ++ "/" ++ r[1].asString}
+//	full { // post all info on the vector
+//		^[	vector.asArray.asString, 
+//			this.formatRatio(ratio), 
+//			reduced.asString, 
+//			this.formatRatio(reducedRatio), 
+//			this.cents.round(0.01)
+//		].asString
+//	}
+//	formatRatio {|r| ^r[0].asString ++ "/" ++ r[1].asString}
 	
 	*with {|reduced| var hv = this.new; 
 		hv.reduced = reduced;
@@ -47,12 +46,15 @@ HarmonicVector{
 		^hv.adjustOctave;
 	}
 	
+	
+	// harmonic measures: 
 	magnitude { ^this.vector.norm }
 	harmonicDistance {^this.ratio.harmonicDistance}
 	harmonicity {^this.ratio.harmonicity}
 	gradusSuavitatis {^this.ratio.gradusSuavitatis}
-					
-	complete { // complete a reduced octave vector by calculating the number of octaves it contains
+			
+	// complete a reduced octave vector by calculating the number of octaves it contains
+	complete { 
 		var denom = 1, num = 1, series;
 		series = this.reduced.collect{|x,i| base[i+1]**x.abs * x.sign};
 		series.do{|x|
@@ -65,6 +67,7 @@ HarmonicVector{
 		^this.vector = Vector.newFrom([this.pow2] ++ this.reduced);
 	}
 
+	// convert from vector to ratio representation
 	toRatio {var num = 1, denom = 1, series;
 		series = this.vector.collect{|x,i| base[i]**x.abs * x.sign};
 		series.do{|x|
@@ -75,6 +78,7 @@ HarmonicVector{
 		^this.ratio = [num, denom]
 	}
 
+	// convert from ratio to vector
 	toVector {var res, maxP, p = this.ratio[0].factors, q = this.ratio[1].factors, pow2;
 		
 		// mathematical correction since 1.factors changed to [] instead of [1]:
@@ -118,6 +122,7 @@ HarmonicVector{
 		^this.reducedRatio = res.reduceRatio; 
 	}
 	
+	// prepare for arithmetic operations by making the dimension of the two vectors the same
 	makeOperands {|tis, tat| var n1 = tis, n2 = tat, dif = tis.size - tat.size; 
 		if (dif == 0) {^[n1, n2]}; 
 		if (dif.isNegative) { 
@@ -149,8 +154,8 @@ HarmonicVector{
 		^HarmonicVector.with(tis / tat)
 	}
 	
-	** {|that| if (that.isNumber) {
-			^HarmonicVector.with(this.reduced * that) 
+	** {|scalar| if (that.isNumber) {
+			^HarmonicVector.with(this.reduced * scalar) 
 		}{
 			"Only scalars allowed".throw;// An hvector can only be raised to the power of a scalar
 		}
@@ -177,8 +182,9 @@ HarmonicVector{
 	}
 	
 	
-	//this method returns whether a vector lies inside a periodicity block 
-	// (as defined in the unisonmatrix)
+	// Returns a boolean answering whether a vector lies inside a periodicity block 
+	// (as defined in the unisonmatrix). It is used in PitchSet to separate into harmonic
+	// and timbral subsets
 	isInIsland{ |unisonmatrix| 	var	max, min, tvect, truth = true;
 		unisonmatrix = unisonmatrix ? #[ [4, 2, 0], [4, -3, 2], [2, 2, -1] ];
 		if (this.reduced.size > unisonmatrix[0].size) {
