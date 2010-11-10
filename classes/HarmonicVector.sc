@@ -154,7 +154,7 @@ HarmonicVector{
 		^HarmonicVector.with(tis / tat)
 	}
 	
-	** {|scalar| if (that.isNumber) {
+	** {|scalar| if (scalar.isNumber) {
 			^HarmonicVector.with(this.reduced * scalar) 
 		}{
 			"Only scalars allowed".throw;// An hvector can only be raised to the power of a scalar
