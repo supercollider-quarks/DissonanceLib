@@ -13,6 +13,14 @@
 		}
 		^[resF, resM.reverse]
 	}
+	
+	asFreqMagPhase {|phases, win, sr|
+		sr ?? {Server.default.sampleRate/2};
+		win ?? {this.size};
+		
+		
+			
+	}
 
 // return the n highest partials
 // this should be an array in the form [ freqs, mags ] like that returned from asFreqMag

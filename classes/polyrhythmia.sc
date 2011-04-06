@@ -4,7 +4,9 @@ PolyRhythmia {
 //class must output how many notes are in each part of the process in each track: begin acc, steady, decell, end!!!
 
 	var <deltaonset, <phase, <tours, <toursBeg, <toursSteady, <toursEnd; //input variables
-	var <quantum, <startAcc, <length_acc, <coming_down, <startEnd, <timeToEnd; //timing
+	var <quantum, <length_acc, <coming_down,<timeToEnd; //timing
+	var <durBeg, <durAcc, <durSteady, <durBack, <durEnd;  //durations
+	var <startAcc, <startSteady, <startBack, <startEnd; //cues
 	var factor, <ndiv, step, elevation, coeff; // for the upwards trip
 	var factor2, <ndiv2, step2, elevation2, coeff2; // for the backwards trip
 	var <outputArray; //output values
@@ -27,11 +29,24 @@ PolyRhythmia {
 		
 		// secondary calculation:
 		quantum = deltaonset[0];
-		startAcc = toursBeg * quantum;
 		length_acc = tours * quantum; // at this time the steady rhythm starts
-		coming_down = (toursBeg * quantum) + length_acc + (toursSteady * quantum ); 
-
-		startEnd = (toursBeg*quantum)+(2*length_acc) + (toursSteady * quantum );  
+		
+		durBeg = toursBeg*quantum; 
+		durAcc = tours * quantum;
+		durSteady = toursSteady*quantum;
+		durBack = tours*quantum;
+		durEnd = toursEnd*quantum;
+		
+		startAcc = durBeg;
+		startSteady = durBeg + durAcc; 
+		startBack = startSteady + durSteady;
+		startEnd = startBack + durBack;
+		
+		// coming_down = (toursBeg * quantum) + length_acc + (toursSteady * quantum ); 
+		coming_down = (toursSteady * quantum);
+		
+		
+		// startEnd = (toursBeg * quantum) + (2 * length_acc) + (toursSteady * quantum );  
 		
 		notesUp={[]}! deltaonset.size;
 		notesSteady={[]}! deltaonset.size;
@@ -86,7 +101,8 @@ PolyRhythmia {
 				elevation[f] = log(1 - (deltaonset[f] / length_acc)) / 
 								log (1 - (ndiv[f].reciprocal));
 				coeff[f] = length_acc ** (1 - elevation[f]); // calculation
-				onset = (coeff[f] * (step[f] ** elevation[f])) + (phase[f] / ndiv[f]);
+//				onset = (coeff[f] * (step[f] ** elevation[f])) + (phase[f] / ndiv[f]);
+				onset = (coeff[f] * (step[f] ** elevation[f]));
 			};
 			//factor[f] = factor[f] - 0.1; // uncomment if first delta onset > quantum
 			if (factor[f] < 1) {factor[f] = 1}; 
@@ -168,7 +184,8 @@ PolyRhythmia {
 			ndiv2[track].do{|k| 
 				onset1 = coeff2[track] * ((timeToEnd[track] - (step2[track] * (k))) ** elevation2[track]);
 				onset2 = coeff2[track] * ((timeToEnd[track] - (step2[track] * (k + 1))) ** elevation2[track]);
-				onset = onset1 - onset2;
+				//onset = onset1 - onset2;
+				onset = onset1 - onset2 + phase[track]/ndiv[track];
                    outputArray[track] = outputArray[track].add(onset);
                    notesDown[track]=outputArray[track].size - notesUp[track] - notesBeg[track] - notesSteady[track];
 			}

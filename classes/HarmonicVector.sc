@@ -64,7 +64,7 @@ HarmonicVector{
 		};
 		this.ratio = [num.asInteger, denom.asInteger];
 		this.adjustOctave;		
-		^this.vector = Vector.newFrom([this.pow2] ++ this.reduced);
+		^this.vector = RealVector.newFrom([this.pow2] ++ this.reduced);
 	}
 
 	// convert from vector to ratio representation
@@ -88,14 +88,14 @@ HarmonicVector{
 		maxP = max(p.maxItem, q.maxItem);
 		if ((maxP == 1) || (maxP.even)) { // 1/1 and its (sub)octaves
 			if (maxP == 1) { 
-				^this.vector = Vector.newFrom([0, 0]) 
+				^this.vector = RealVector.newFrom([0, 0]) 
 				
 			}{ 
 				if (q.includes(2)) { pow2 = q.size.neg }{ pow2 = p.size }; 
-				^this.vector = Vector.newFrom([pow2, 0]) 
+				^this.vector = RealVector.newFrom([pow2, 0]) 
 			};
 		}{	
-			res = Vector.newFrom({0} ! (maxP.indexOfPrime + 1));
+			res = RealVector.newFrom({0} ! (maxP.indexOfPrime + 1));
 		};
 		p.collect{|x| 
 			var idx = base.indexOf(x);
@@ -126,9 +126,9 @@ HarmonicVector{
 	makeOperands {|tis, tat| var n1 = tis, n2 = tat, dif = tis.size - tat.size; 
 		if (dif == 0) {^[n1, n2]}; 
 		if (dif.isNegative) { 
-			n1 = Vector.newFrom(tis ++ ({0}!dif.abs))
+			n1 = RealVector.newFrom(tis ++ ({0}!dif.abs))
 		}{  
-			n2 = Vector.newFrom(tat ++ ({0}!dif))
+			n2 = RealVector.newFrom(tat ++ ({0}!dif))
 		};
 		^[n1,n2]
 	}
@@ -233,11 +233,12 @@ HarmonicVector{
 //	ratio {^Ratio(this) }
 	
 	asVector {
-	^Vector.newFrom(this) }
+		^RealVector.newFrom(this) 
+	}
 
 }
 
-+ Vector {
++ RealVector {
 	
 		*newFrom {|array|  ^super.new(array.size).addAll(array)}
 }

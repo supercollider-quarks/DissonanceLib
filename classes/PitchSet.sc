@@ -129,7 +129,7 @@ PitchSet { //a set of harmonic vectors that are partitioned into islands (harmon
 		).play 
 	}
 	
-	/* a–adir remove y otros mŽtodos relativos a set y collection*/
+	/* add remove & other methods related to set & collection */
 	
 	partition {|unisonvector|
 		this.harmonicSet = Set.new;
@@ -198,7 +198,7 @@ PitchSet { //a set of harmonic vectors that are partitioned into islands (harmon
 		equ = ({1}!filteredScale.size).normalizeSum;
 		
 		this.currentRanks = rnk; // this is uselful for accent calculations
-	// this is the nitty gritty if the method: 
+	// this is the nitty gritty of the method: 
 		interweights = inv.collect{|x,i| x.interpolate3(equ, wgt[i], polarity) };
 		data = filteredScale.collect{|x,i| [x, filteredScale, interweights[i] ] };
 	// make markov stream: 
@@ -206,7 +206,7 @@ PitchSet { //a set of harmonic vectors that are partitioned into islands (harmon
 		this.markov.putAll(data); 
 		this.markov.makeSeeds;
 		this.markovStream = this.markov.asStream;
-	// return the calculated weights according to 'polatity' (or harmonic field strength): 
+	// return the calculated weights according to harmonic field strength: 
 		^interweights
 	}
 	
@@ -221,21 +221,18 @@ PitchSet { //a set of harmonic vectors that are partitioned into islands (harmon
 		"\nTimbral: " ++ this.setT.ratioPost ++ "\n"
 	}
 	
-	gradusSuavitatis {var h = this.setH, t = this.setT, b = (h ++ t);
-		b = b[b.ratioToFreq.order]; // order the whole enchilada
-		h = h[h.ratioToFreq.order];
-		t = t[t.ratioToFreq.order];
-		
+	gradusSuavitatis {var h = this.setH.ratioSort, 
+		t = this.setT.ratioSort, 
+		b = (h ++ t).ratioSort;		
 		postf("Complete: %\nHarmonic: %\nTimbral: %\n", 
 			b.gradusSuavitatisN,
 			h.gradusSuavitatisN,
 			t.gradusSuavitatisN);
 	}
 	
-	asHarmonicSeries { var h = this.setH, t = this.setT, b = (h ++ t);
-		b = b[b.ratioToFreq.order]; // order the whole enchilada
-		h = h[h.ratioToFreq.order];
-		t = t[t.ratioToFreq.order];
+	asHarmonicSeries { var h = this.setH.ratioSort, 
+		t = this.setT.ratioSort, 
+		b = (h ++ t).ratioSort;
 		postf("complete: %\n\nharmonic: %\n\ntimbral: %\n\n", 
 			b.ratioPost, h.ratioPost, t.ratioPost);
 		postf("Complete: %\nHarmonic: %\nTimbral: %\n", 
@@ -244,25 +241,40 @@ PitchSet { //a set of harmonic vectors that are partitioned into islands (harmon
 			t.ratioToHarmonics)
 	}
 	
-	asScale { var b = this.setH ++ this.setT;
-		b = b[b.ratioToFreq.order];	
-		postf("Complete (absolute): %\n", b.ratioPost);
+	reducedRatios { ^this.set.collect{|x| x.reducedRatio}.asArray.ratioSort }
+	
+	sort {|metric|
+		if (metric.class != HarmonicMetric) {metric = HarmonicMetric(metric)};
+		this.metric = metric;
+		^metric.order(this.ratios)	
+	}	
+		
+	
+	asScale {|ffreq = 440| var b = (this.setH ++ this.setT).ratioSort, 
+		c = this.reducedRatios, d, e;
+		postf("Complete (absolute): %\tSize: %\n", b.ratioPost, b.size);
 		postf("Complete (adjacency): %\n", b.ratioDifferentiate.ratioPost);
 		postf("Complete (cents): %\n", b.cents.round(1));
+		postf("Reduced: %\tSize: %\n", c.ratioPost, c.size);
+		postf("Reduced (adjacency): %\n\n", c.ratioDifferentiate.ratioPost);
+		postf("Notes: %\n", (b.ratioToFreq * ffreq).asNote);
+		postf("Sorted by %: %\n", this.metric, d = this.sort.ratioPost);
+//		e = d.collect(_.order);
+//		postf("Ranks: %\n", e);
+		
 	}
 	
 	asRatios {var b = this.setH ++ this.setT;
-		^this.ratios = b[b.ratioToFreq.order];	
+		this.ratios = b[b.ratioToFreq.order];	
 	}
 	
-/*	reducedSet{|which = \harmonic|
-		^this.harmonicSet.collect{
-*/
+	
 /* 
 
-			Visualization tools
+			Visualization tools (requires GNUPlot & GNUPlot quark)
 
 */
+
 // what = \ratios, \ranks, \weights, \currRanks; 
 // if hollow = true then the diagonal i=j will be the minval (only in the case of metricM)
 	plotHarmonicField {|what = \metric, hollow = true, minval = 0.01, title | 
@@ -298,6 +310,7 @@ PitchSet { //a set of harmonic vectors that are partitioned into islands (harmon
 	}
 	
 // possible types: \235 (octaves, fifths, thirds) \357 (5s, 3rds, 7ths) or \5711
+// not working yet, only plots \235 space still
 	plotHarmonicSpace {|type = \235|
 		var vectors, ratioS, data, gnuplot;
 		// if('GNUPlot'.asClass.isNil, { "this code requires the GNUPlot Quark".error } )
@@ -326,6 +339,39 @@ PitchSet { //a set of harmonic vectors that are partitioned into islands (harmon
 			file.close;
 			^"done"
 	}
+	
+	selectPrime {|prime = 7| 
+			^this.ratios.select{|x| 
+					(x[0].factors.includes(prime)) or: (x[1].factors.includes(prime))
+			}; 
+	}
+	
+	rejectPrime {|prime = 7| 
+			^this.ratios.reject{|x| 
+					(x[0].factors.includes(prime)) or: (x[1].factors.includes(prime))
+			}; 
+	}
+	
+	separateIntoPrimes	{ var pr, maxP, multi, primes, primesL, separate;
+		pr = this.reducedRatios.ratioToHarmonics.collect{|x| x.factors};
+		maxP = 2;
+		pr.do{|x| var maxy = x.maxItem; if (maxy > maxP) {maxP = maxy} };
+		primes = Array.primes(maxP);
+		multi = primes.collect{|x| this.selectPrime(x)};
+		separate = List[];
+		primesL = primes.asList;
+		multi.do{|x, i| var filt = x;
+			primesL.remove(primes[i]);	// remove primes higher than the list we're dealing with
+			primesL.do{|p|
+				filt = filt.reject{|ratio|
+					(ratio.first.factors.includes(p)) or:
+					(ratio.last.factors.includes(p))
+				};
+			};
+			separate = separate.add(filt); 
+		};
+		^separate
+	}
 
 }
 
@@ -337,5 +383,5 @@ PitchSet { //a set of harmonic vectors that are partitioned into islands (harmon
 
 
 /*
-TODO: derive unison vectors for 4 and 5 dimensions! We need to include 11 and 13 somehow.
+TO DO: derive unison vectors for 4 and 5 dimensions! We need to include 11 and 13 somehow.
 */

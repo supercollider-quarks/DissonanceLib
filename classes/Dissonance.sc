@@ -108,7 +108,7 @@ Dissonance {
 		this.harmonicity = metric.value(this.ratios);	
 		this.pitchSet = PitchSet.with(this.ratios, unisonvector); 
 		if (post) {	
-			postf("New ratios: %\nPitchSet: %\n", this.ratios.ratioPost, this.pitchSet);
+			postf("New ratios: %\n\nPitchSet: %\n", this.ratios.ratioPost, this.pitchSet);
 		};
 		^this;
 	}
@@ -223,6 +223,8 @@ Dissonance {
 	}
 	
 // filter scales by eliminating ratios with a maximum prime factor
+
+// (should factor a single prime from the ratos, not all greater than)
 	factor {|maxPrime = 7| 
 			this.ratios = this.ratios.reject{|x| 
 					(x[0].factors.maxItem > maxPrime) or: (x[1].factors.maxItem > maxPrime)}; 
@@ -386,29 +388,7 @@ Dissonance {
 		^dcurve
 	}
 
-// what would a cents to ratio method look like?	
-// sweep roughness measure by iterating through a list of rationals, 
-// parncutt method (amps should be in sones) 
-// these methods are experimental: 
-	rationalRoughness {|f, s, ratioList | var ratios;
-		f = f ? partials[0];
-		s = s ? partials[1]; 
-		ratios = ratioList ? IntervalTable.table.ratios;
-		ratios = ratios[ratios.cents.order];
-		^ratios.collect{|ratio| this.dissmeasure2(f.asBark, (f * ratio[0]/ratio[1]).asBark, s, s) };
-	}		 
 
-	rationaRoughnessHarm {|f, s, ratioList | var ratios;
-		f = f ? partials[0];
-		s = s ? partials[1]; 
-		ratios = ratioList ? IntervalTable.table.ratios;
-		ratios = ratios[ratios.harmonicity.abs.order].reverse;
-		[f,s,ratios].postln; 
-		^ratios.collect{|ratio| this.dissmeasure2(f.asBark, (f * ratio[0]/ratio[1]).asBark, s, s) };
-	}		 
-	
-	minimaForRationals { }
-	
 // Get the minima of a dissonance curve:
 	minima {|dissArray|
 		var gradient = dissArray.differentiate,
@@ -430,6 +410,31 @@ Dissonance {
 		^min
 	}
 	
+
+// The following methods are experimental: 
+// what would a cents to ratio method look like?	
+// sweep roughness measure by iterating through a list of rationals, 
+// parncutt method (amps should be in sones) 
+
+	rationalRoughness {|f, s, ratioList | var ratios;
+		f = f ? partials[0];
+		s = s ? partials[1]; 
+		ratios = ratioList ? IntervalTable.table.ratios;
+		ratios = ratios[ratios.cents.order];
+		^ratios.collect{|ratio| this.dissmeasure2(f.asBark, (f * ratio[0]/ratio[1]).asBark, s, s) };
+	}		 
+
+	rationaRoughnessHarm {|f, s, ratioList | var ratios;
+		f = f ? partials[0];
+		s = s ? partials[1]; 
+		ratios = ratioList ? IntervalTable.table.ratios;
+		ratios = ratios[ratios.harmonicity.abs.order].reverse;
+		[f,s,ratios].postln; 
+		^ratios.collect{|ratio| this.dissmeasure2(f.asBark, (f * ratio[0]/ratio[1]).asBark, s, s) };
+	}		 
+	
+	minimaForRationals { }
+	
 	
 // get the second derivative for the dissonance curve. Experimental.
 	minima2 {|dissArray|
@@ -450,14 +455,10 @@ Dissonance {
 		^min
 	}
 }
+
 /*
-TODO: 
 
-important: there should be a curvature analysis for minima of 'second order' so that valleys where curvature changes and not just peaks are detected. 
-
-also: maybe do the scale analysis directly from the frequency ratios and not from the ratios in order not to loose numeric resoultion, i.e. in 1.00 and 1.01 being both [1,1] in asRatio: so conversion to cents from fratios
-
-
+TO DO:
 
 /*
 
