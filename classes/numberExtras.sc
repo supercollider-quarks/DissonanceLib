@@ -237,8 +237,10 @@ USAGE:  a_prime.primeHarmonics(highest_harmonic)
 }
 
 + SequenceableCollection {
+//  instead make a Ratio class!!
 	
 //	The following three methods deal with rational numbers, expressed as [p,q] arrays: 
+
 	
 	// rational division: [p,q] / [r,s]. ex: [5,9].ratioDiv([2,6]) -> [5,3]
 	ratioDiv {|that, reduce = true| 
@@ -301,11 +303,12 @@ USAGE:  a_prime.primeHarmonics(highest_harmonic)
 	}
 	
 	// from adjecency to absolute intervals: 
-	ratioIntegrate { var list, prev = [1,1];
+	ratioIntegrate { var res, list, prev = [1,1];
 		list = this.class.new(this.size);
-		this.do{|x|
-			list.add((x * prev).reduceRatio);
-			prev = x;
+		this.do{|x| 
+			res = (x * prev).reduceRatio;
+			list.add(res);
+			prev = res;
 		};
 		^list
 	}
@@ -319,19 +322,81 @@ USAGE:  a_prime.primeHarmonics(highest_harmonic)
 	// must be an array of ratios. The collection of ratios will be converted as a group to harms.
 	//	Ex. [[1,1],[16,15],[6,5],[4,3],[3,2],[8,5],[9,5],[2,1]].ratioToHarmonics ->
 	//	[ 30, 32, 36, 40, 45, 48, 54, 60 ]		
-	ratioToHarmonics { var 
-		numerator = this.collect{|x| x[0]}, 
-		denominator = this.collect{|x| x[1]};
-		^(numerator * denominator.reduce(\lcm)).div(denominator)
+	ratioToHarmonics { var numerator, denominator;
+		if ( (this.size == 2) and: (this[0].isNumber) ) {
+			numerator = this[0]; 
+			denominator = this[1];
+			^[numerator.lcm(denominator).div(denominator)]
+		}{
+			numerator = this.collect{|x| x[0]}; 
+			denominator = this.collect{|x| x[1]};
+			^(numerator * denominator.reduce(\lcm)).div(denominator);
+		};
+		
 	}
 	
 	// must be an array of whole numbers
 	// ex. [24,27,30,32,36,40,45,48].harmonicsToRatios ->
 	//					 [[1,1],[9,8],[5,4],[4,3],[3,2],[5,3],[15,8],[2,1]]
-	harmonicsToRatios	{ var ratios = this.collect{|x| [x,1]};
+/*	harmonicsToRatios	{ var ratios = this.collect{|x| [x,1]};
 		^ratios.collect{|x| x.ratioDiv([this.minItem, 1])}
 	}
-					
+*/
+	
+//	new version: make ratios with the smallest harmonic and reduce
+	harmonicsToRatios { ^[this,this.minItem].flop.collect(_.reduceRatio) }
+	
+/*	subharmonicsToRatios {var ratios = this.collect{|x| [1,x]};
+		^ratios.collect{|x| x.ratioDiv([1,this.maxItem])}
+	}
+*/
+	subharmonicsToRatios { ^[this.maxItem, this].flop.collect(_.reduceRatio)}
+	
+	arithmeticMean { ^(this.sum / this.size) }
+	
+	harmonicMean { ^(this.size / this.reciprocal.sum) }
+	
+	geometricMean { ^( this.reduce('*')**(1/this.size)) }
+	
+	// integer means: 
+	intArithmeticMean {
+		var ratio = [this[0] * 2, this[1] * 2], 
+		res = [ ratio[0], ratio.mean.asInteger, ratio[1] ].reverse.harmonicsToRatios;
+		^res[1..].ratioDifferentiate
+	}
+	
+	intHarmonicMean { ^this.intArithmeticMean.reverse }
+
+// Novaro arithmetic progression	
+		novaroSeries {|n = 1|var p,q;
+		#p,q  = this;
+		^Array.series(n+2, min(p,q) * (n+1), (p-q).abs)
+	}
+	
+// Novaro fundamental scale
+	novaroF {|n = 1| ^this.novaroSeries(n).harmonicsToRatios }
+	
+// Novaro reciprocal scale
+	novaroR {|n = 1| 
+		^this.novaroF(n).collect{|x| 
+			[x[1] * this[0], x[0] * this[1]].reduceRatio 
+		}.ratioSort
+	}
+	
+//Novaro gradual scale (with a cofundamental)
+	novaroG{|n = 1, cofund = #[3,2]|
+		^this.novaroF(n).collect{|x|
+			[ x[1] * cofund[0], x[0] * cofund[1] ].reduceRatio
+		}.ratioSort
+	}
+	
+// Novaro complex scale
+	novaroC{|n = 1, cofund = #[3,2]|
+		^(this.novaroF(n) ++ this.novaroR(n)).removeDuplicates.ratioSort
+	}
+
+
+				
 //	several methods designed to work with arrays of pairs (either rationals or [freq, spl]):
 
 	// phon values for [freq, spl] pairs: 
@@ -378,7 +443,7 @@ USAGE:  a_prime.primeHarmonics(highest_harmonic)
 		if ( (this.size == 2) and: (this[0].isNumber) ) 
 			{
 				res = this[1].harmonicity(this[0]);
-				if (clean) {if (res.isNaN) { res = 2 }}; // replace harmonicity of 1/1 with 2
+				if (clean) { if (res.isNaN) { res = 2 }}; // replace harmonicity of 1/1 with 2
 												   // instead of nan
 			}{
 				res = this.collect({|x| x.harmonicity(clean) })
@@ -409,6 +474,7 @@ USAGE:  a_prime.primeHarmonics(highest_harmonic)
 	
 	// returns the gradus suavitatis of a scale or chord
 	gradusSuavitatisN { ^[this.ratioToHarmonics.reduce(\lcm), 1].gradusSuavitatis}
+
 
 	harmonicityBetween{}
 	

@@ -258,7 +258,7 @@ PitchSet { //a set of harmonic vectors that are partitioned into islands (harmon
 		postf("Reduced: %\tSize: %\n", c.ratioPost, c.size);
 		postf("Reduced (adjacency): %\n\n", c.ratioDifferentiate.ratioPost);
 		postf("Notes: %\n", (b.ratioToFreq * ffreq).asNote);
-		postf("Sorted by %: %\n", this.metric, d = this.sort.ratioPost);
+//		postf("Sorted by %: %\n", this.metric, d = this.sort.ratioPost);
 //		e = d.collect(_.order);
 //		postf("Ranks: %\n", e);
 		
@@ -355,7 +355,15 @@ PitchSet { //a set of harmonic vectors that are partitioned into islands (harmon
 	separateIntoPrimes	{ var pr, maxP, multi, primes, primesL, separate;
 		pr = this.reducedRatios.ratioToHarmonics.collect{|x| x.factors};
 		maxP = 2;
-		pr.do{|x| var maxy = x.maxItem; if (maxy > maxP) {maxP = maxy} };
+		pr.do{|x| var maxy = x.maxItem; 
+//			[x, maxy].postln; 
+			if (x.isEmpty) {
+					\teCache.postln;
+					^List[ [ [ 9, 8 ], [ 128, 81 ], [ 32, 9 ] ], [ [ 15, 8 ], [ 81, 40 ], [ 5, 2 ], [ 45, 16 ], [ 16, 5 ], [ 5, 1 ], [ 160, 27 ], [ 32, 5 ], [ 20, 3 ], [ 36, 5 ] ], [ [ 9, 7 ], [ 7, 5 ], [ 35, 16 ], [ 16, 7 ], [ 24, 7 ], [ 27, 7 ], [ 35, 8 ], [ 28, 3 ] ], [ [ 16, 11 ], [ 33, 4 ] ] ] 
+				}{
+					if (maxy > maxP) {maxP = maxy} 
+				};
+		};
 		primes = Array.primes(maxP);
 		multi = primes.collect{|x| this.selectPrime(x)};
 		separate = List[];
@@ -368,7 +376,9 @@ PitchSet { //a set of harmonic vectors that are partitioned into islands (harmon
 					(ratio.last.factors.includes(p))
 				};
 			};
-			separate = separate.add(filt); 
+			if (filt.isEmpty.not) {
+				separate = separate.add(filt); 
+			};
 		};
 		^separate
 	}
@@ -377,7 +387,10 @@ PitchSet { //a set of harmonic vectors that are partitioned into islands (harmon
 
 + SequenceableCollection {
 	
-	asPitchSet {^PitchSet.with(this)}
+	asPitchSet {|unisonvector|
+		
+		^PitchSet.with(this, unisonvector ? PitchSet.unisons.dim3.et12[1]);
+	}
 		
 }	
 

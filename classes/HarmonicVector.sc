@@ -1,6 +1,7 @@
 HarmonicVector{
 	classvar base;
-	var <>vector, <>ratio, <>reduced, <>reducedRatio, <>pow2; 
+	var <>vector, <>ratio, <>reduced, <>reducedRatio, <>functions, <>pow2; 
+	const simbols = #["", \D, \M, \S, \s, \m, \d];
 	
 	*initClass { 
 			base = Array.primes(43); // (way beyond human harmonic perception)
@@ -17,33 +18,29 @@ HarmonicVector{
 	
 	printOn {|stream|
 		stream << this.class.name <<"( " << 
-		this.vector.asArray << ", " << 
+		this.vector.as(Array) << ", " << 
 		this.ratio.ratioPost << ", " << 
-		this.reduced  << ", " << 
+		this.reduced.as(Array)  << ", " << 
 		this.reducedRatio.ratioPost << ", " <<
-		this.cents.round(0.01) << "¢ )";
+		this.cents.round(0.01) << "¢";
+		if (this.functions != "") {
+			stream << ", " << this.functions << ")\n"
+		}{ stream << ")"}
 	}		
-	
-//	full { // post all info on the vector
-//		^[	vector.asArray.asString, 
-//			this.formatRatio(ratio), 
-//			reduced.asString, 
-//			this.formatRatio(reducedRatio), 
-//			this.cents.round(0.01)
-//		].asString
-//	}
-//	formatRatio {|r| ^r[0].asString ++ "/" ++ r[1].asString}
+
 	
 	*with {|reduced| var hv = this.new; 
 		hv.reduced = reduced;
-		^hv.complete;  
+		hv.complete;  
+		^hv.getFunctions;
 	}
 	
 	*from {|ratio| var hv = this.new;
 		hv.ratio = ratio.reduceRatio;
 		hv.toVector;
 		hv.reduced = hv.vector[1..];
-		^hv.adjustOctave;
+		hv.adjustOctave;
+		^hv.getFunctions;
 	}
 	
 	
@@ -181,11 +178,22 @@ HarmonicVector{
 		}
 	}
 	
+	getFunctions{ if (this.reduced[0..2] == [0,0,0]) {
+				^this.functions = \T;
+			}{ ^this.functions = this.reduced[0..2].collect{|x,i| var r = "";
+					if (x.abs > 1) {r = x.abs.asSymbol};
+					r++simbols.wrapAt((i+1) * x.sign)
+				}.flat.join
+			}
+	}
+	
+	// TODO an inverse of getFunctions: from a function to an Hvector
+	
 	
 	// Returns a boolean answering whether a vector lies inside a periodicity block 
 	// (as defined in the unisonmatrix). It is used in PitchSet to separate into harmonic
 	// and timbral subsets
-	isInIsland{ |unisonmatrix| 	var	max, min, tvect, truth = true;
+	isInIsland{ |unisonmatrix| 	var	max, min, truth = true;
 		unisonmatrix = unisonmatrix ? #[ [4, 2, 0], [4, -3, 2], [2, 2, -1] ];
 		if (this.reduced.size > unisonmatrix[0].size) {
 			truth = false
@@ -194,10 +202,12 @@ HarmonicVector{
 			min = unisonmatrix.collect{|x| min(x,0)};
 			max = max.flop.collect{|x| x.maxItem};
 			min = min.flop.collect{|x| x.minItem};
-			
-		tvect = this.reduced.as(Array).collect{|v,i| v.inclusivelyBetween(min[i], max[i])};
-			tvect.do{|x| if (x != true) {truth = false}};
-//			[max,min,tvect,truth].postln;
+			this.reduced.as(Array).collect{|v,i| 
+				v.inclusivelyBetween(min[i], max[i])
+			}.do{|x| 
+				if (x != true) {truth = false}
+			};
+//			[max,min,truth].postln;
 		};
 		^truth
 	}

@@ -23,14 +23,7 @@ Salience {
 			}; 
 			^esto.separate;
 	}
-					
-	select {|threshold| var r, order,
-			d = this.pitches.values.select{|h| h >= threshold}.removeDuplicates;
-			r = d.collect{|dd| [this.pitches.findKeyForValue(dd), dd]}.flop;
-			order = r[1].order({|a,b| a > b});
-			^[r[0][order], r[1][order]].flop
-	}
-	
+						
 	separate {|sort = true| var v, s, order;
 			this.pitches.keysValuesDo{|k,v|
 				if (this.freqs.includes(k)) { 
@@ -52,6 +45,32 @@ Salience {
 			^this
 	}
 	
+	select {|threshold| var r, order,
+			d = this.pitches.values.select{|h| h >= threshold}.removeDuplicates;
+			r = d.collect{|dd| [this.pitches.findKeyForValue(dd), dd]}.flop;
+			order = r[1].order({|a,b| a > b});
+			^[r[0][order], r[1][order]].flop
+	}
+	
+	
+	orderV {|threshold| var pitches, order;
+		pitches = this.virtual.select{|h| h[1] >= threshold};
+		order = pitches.flop[0].order;
+		^pitches[order]; 		
+	}
+
+	orderS {|threshold| var pitches, order;
+		pitches = this.spectral.select{|h| h[1] >= threshold};
+		order = pitches.flop[0].order;
+		^pitches[order]; 		
+	}
+	
+	highestVirtual {var highestSalience;
+		highestSalience = this.virtual[0][1];
+		^this.orderV(highestSalience);
+	}
+	
+	
 	postNew {}
 
 	postAll {	 ^this.virtual.do{|r| [r[0].asNote, r[1]].postln} }
@@ -60,3 +79,6 @@ Salience {
 	
 	/*TO DO: multiplicity and 'compositional virtual pitch' */
 }
+
+
+

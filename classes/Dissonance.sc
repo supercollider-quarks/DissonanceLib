@@ -86,7 +86,7 @@ Dissonance {
 			{^"Invalid method"}
 		);
 		diss.scale = diss.minima(diss.dcurve).round(inc);
-		diss.scale2 = diss.minima2(diss.dcurve);
+//		diss.scale2 = diss.minima2(diss.dcurve);
 		diss.ratios = diss.scale.asRatio(inc.reciprocal, false); // a first crude approximation
 //		diss.harmonicity = diss.ratios.harmonicity;
 		diss.cents = diss.scale.cents;
@@ -204,9 +204,9 @@ Dissonance {
 //	hacer un view encima de este donde se pongan los ratios en su lugar y en colores segun su tipo 
 		view = Plotter.new("dissonance curve", Rect(780, 456, 500, 300));
 		view.value = this.dcurve;
-		view.specs = [this.dcurve.minItem, this.dcurve.maxItem, \lin, 0.001, 0, " rough"].asSpec;
+		view.specs = [this.dcurve.minItem, this.dcurve.maxItem, \exp, 0.0, 0, " "].asSpec;
 		view.domainSpecs = 
-			[this.intervals.first, this.intervals.last, \lin, 0.01, 0, " FR"].asSpec;
+			[this.intervals.first, this.intervals.last, \lin, 0.0, 0, " "].asSpec;
 		^view;
 	}
 	
@@ -246,8 +246,9 @@ Dissonance {
 			^this; 
 	}
 	
-	makeMatrix{ |pwr = 15, add = 1 |
-		this.pitchSet.makeProbMatrix(pwr, add); 
+	makeMatrix{ |pwr = 15, add = 1, metric |
+		metric = metric ? \harmonicity;
+		this.pitchSet.makeProbMatrix(pwr, add, metric); 
 		// the following is for backwards compatibility: 
 		this.ratioM = this.pitchSet.ratioM;
 		this.harmonicityM = this.pitchSet.metricM;
