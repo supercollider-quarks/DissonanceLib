@@ -3,7 +3,8 @@ PitchSet { //a set of harmonic vectors that are partitioned into islands (harmon
 	Fokker, A, “Unison vectors and periodicity blocks in the three-dimensional (3-5-7-)harmonic
 	lattice of notes”, Koninklijke Nederlandse Akademie van Wetenschappen - Amsterdam, Proceedings, 	Series B 72, No. 3, 1969
 */
-	classvar <unisons; 
+	classvar <unisons;
+	// unisonvectorS!?  
 	var <>unisonvector, <>set, <>harmonicSet, <>timbralSet, <>setH, <>setT, <>ratios;
 	// should belong to HarmonicField:
 	var <>ratioM, <>metricM, <>ranks, <>weights, <>invweights, <>equweights;
@@ -239,6 +240,7 @@ PitchSet { //a set of harmonic vectors that are partitioned into islands (harmon
 			b.ratioToHarmonics,
 			h.ratioToHarmonics,
 			t.ratioToHarmonics)
+		^b.ratioToHarmonics;
 	}
 	
 	reducedRatios { ^this.set.collect{|x| x.reducedRatio}.asArray.ratioSort }
@@ -269,13 +271,44 @@ PitchSet { //a set of harmonic vectors that are partitioned into islands (harmon
 	}
 	
 	
+	// it is still producing octave reduced intervals, check how to do it without octave reduction
+	asETdegrees {|tet = 53, highestPrime = 7| 
+		var kh, kt, hset, tset, hOrd, tOrd, hRatios, tRatios, primes;
+		primes = Array.primes(highestPrime)[1..]; 
+		
+		if (this.harmonicSet.isEmpty.not) {
+			hset = this.harmonicSet.collect{|x| [x.reduced, x.ratio]}.asArray.flop;
+			hOrd = hset[1].ratioToFreq.order;
+			hRatios = hset[1][hOrd];
+			hset = hset[0][hOrd].collect{|x| x.as(Array)};
+			hset = hset.collect{|x| x.collect{|y,i| y * primes[i].log2}.sum};
+			kh = hset.collect{|a| (tet*a.frac).round(1)};
+		}{
+			kh = [];
+		};
+		if (this.timbralSet.isEmpty.not) {
+			tset = this.timbralSet.collect{|x| [x.reduced, x.ratio]}.asArray.flop;
+			tOrd = tset[1].ratioToFreq.order;
+			tRatios = tset[1][tOrd];
+			tset = tset[0][tOrd].collect{|x| x.as(Array)};
+			tset = tset.collect{|x| x.collect{|y,i| y * primes[i].log2}.sum};
+			kt = tset.collect{|a| (tet*a.frac).round(1)};
+		}{
+			kt = []
+		};		
+		postf(
+		"%-TET\nHarmonic Ratios: %\nHarmonic Degrees: %\nTimbral Ratios: %\nTimbral Degrees: %\n", 
+		tet, hRatios.ratioPost, kh, tRatios.ratioPost, kt);
+		^[kh,kt]
+	}
+	
 /* 
 
 			Visualization tools (requires GNUPlot & GNUPlot quark)
 
 */
 
-// what = \ratios, \ranks, \weights, \currRanks; 
+// what = \metric, \ranks, \weights, \currRanks; 
 // if hollow = true then the diagonal i=j will be the minval (only in the case of metricM)
 	plotHarmonicField {|what = \metric, hollow = true, minval = 0.01, title | 
 		var data, field, gnuplot;
@@ -333,7 +366,9 @@ PitchSet { //a set of harmonic vectors that are partitioned into islands (harmon
 				file.write(this.ratios[i].ratioPost ++ "\t");
 				x.do{|y,j| 
 					if (j == (x.size - 1)) {char = "\n"} {char = "\t"};
-					file.write(y.reciprocal.round(0.001).asString ++ char);
+					if (this.metric.type == \harmonicity) {
+						file.write(y.reciprocal.round(0.001).asString ++ char);
+					}{	file.write(y.round(0.001).asString ++ char); };
 				};
 			};
 			file.close;

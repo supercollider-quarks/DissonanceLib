@@ -3,10 +3,14 @@
 //	 Methods that can be applied to rational numbers will work with arrays of [p,q]'s
 
 	//ex. 3.cents(2) or 440.cents(60.midicps) or [2,3].cents
-	cents { | frq = 1| 
-		^1200 * ( (this/frq).log / 2.log )
+//	cents { | frq = 1| 
+//		^1200 * ( (this/frq).log / 2.log )
+//	}
+// used to be the mathematical formula above but was changed for efficiency to:
+	cents {|frq=1|
+		^( (this/frq).ratiomidi * 100 )
 	}
-
+	
 	//ex. 440.addCents(Array.series(12, 0, 100)).asNote
 	addCents { |cents|
 		^this * (2**(cents/1200))
@@ -251,6 +255,21 @@ USAGE:  a_prime.primeHarmonics(highest_harmonic)
 	// express a rational as [p,q] where p and q are coprime:
 	reduceRatio { ^this div: (this[0] gcd: this[1]) }
 
+	reduceOctave { ^this.asHvector.collect{|x|  x.reducedRatio.as(Array) } }		
+		
+//			var fratio = x[0]/x[1], pow2 = 0, res = x.copy;
+//			{ fratio < 1 }.while{ fratio = fratio * 2; pow2 = pow2 + 1 };
+//			{ fratio >= 2 }.while{ fratio = fratio / 2; pow2 = pow2 - 1 };
+//			if (pow2.isNegative) { 
+//				res[1] = (res[1] * ( 2**pow2.abs )).asInteger
+//			}{
+//				res[0] = (res[0] * ( 2**pow2 )).asInteger
+//			}; 
+//			res
+//		}
+//	}
+
+
 	ratioPost {|char = ", "| 
 		if ( (this.size == 2) and: (this[0].isNumber) ) {
 			^this[0].asString ++ "/" ++ this[1].asString
@@ -368,12 +387,12 @@ USAGE:  a_prime.primeHarmonics(highest_harmonic)
 	intHarmonicMean { ^this.intArithmeticMean.reverse }
 
 // Novaro arithmetic progression	
-		novaroSeries {|n = 1|var p,q;
+	novaroSeries {|n = 1|var p,q;
 		#p,q  = this;
 		^Array.series(n+2, min(p,q) * (n+1), (p-q).abs)
 	}
 	
-// Novaro fundamental scale
+// Novaro fundamental scale. 'this' is a ratio [p,q]
 	novaroF {|n = 1| ^this.novaroSeries(n).harmonicsToRatios }
 	
 // Novaro reciprocal scale
@@ -394,10 +413,32 @@ USAGE:  a_prime.primeHarmonics(highest_harmonic)
 	novaroC{|n = 1, cofund = #[3,2]|
 		^(this.novaroF(n) ++ this.novaroR(n)).removeDuplicates.ratioSort
 	}
-
+	
+	novaroPosition {|pos = 2|
+		^(this[(pos-1)..] 
+		++ (pos -1).collect{|x| (this.last * this[x+1]).reduceRatio})
+	}
+	
+	novaroPositionTransp {|pos = 2| var posicion, first;
+		posicion = this.novaroPosition(pos);
+		first = posicion.first;
+		^posicion.collect{|x| x.ratioDiv(first)}
+	}
+	
+	novaroChordPositions {
+		^(this.size-1).collect{|x| this.novaroPositionTransp(x+1)}
+	}
+	
+	// see Novaro, p. 43
+	novaroChordSystem {|n = 1| var fund, recip;
+		fund = this.novaroF(n).novaroChordPositions;
+		recip = this.novaroR(n).novaroChordPositions;
+		recip = [recip[0]] ++ recip[1..].reverse;
+		^fund.collect{|x,i| [x,recip[i]]}.flatten(1);
+	}		
 
 				
-//	several methods designed to work with arrays of pairs (either rationals or [freq, spl]):
+//	several methods designed to work with arrays of pairs (either rationals or [', spl]):
 
 	// phon values for [freq, spl] pairs: 
 	asPhon {|calib = 0| var res;
@@ -453,11 +494,20 @@ USAGE:  a_prime.primeHarmonics(highest_harmonic)
 
 	// James Tenney's harmonic distance (city-block metric of harmonic lattices)
 	// for arrays of rational pairs [p,q] (see Tenney[1983]):
+
 	harmonicDistance { 
 		if ( (this.size == 2) and: (this[0].isNumber) ) {
-				^(this[1] * this[0]).log;
+				^(this[1] * this[0]).log2;
 			}{
 				^this.collect{|x| x.harmonicDistance }
+			};
+	}
+	
+	pitchDistance {
+		if ( (this.size == 2) and: (this[0].isNumber) ) {
+				^(max(this[0], this[1]) / min(this[0], this[1])).log2;
+			}{
+				^this.collect{|x| x.pitchDistance }
 			};
 	}
 	
@@ -473,7 +523,7 @@ USAGE:  a_prime.primeHarmonics(highest_harmonic)
 	}
 	
 	// returns the gradus suavitatis of a scale or chord
-	gradusSuavitatisN { ^[this.ratioToHarmonics.reduce(\lcm), 1].gradusSuavitatis}
+	gradusSuavitatisN { ^[this.ratioToHarmonics.reduce(\lcm).abs, 1].gradusSuavitatis}
 
 
 	harmonicityBetween{}
@@ -560,7 +610,8 @@ USAGE:  a_prime.primeHarmonics(highest_harmonic)
      	};
 		^obj
 	}
-	
+
+		
 	analyseScale {|tolerance = 16, type = \size, maxNum = 729, maxDenom = 512, maxPrime = 31, post = true|
 		var classification, res, cents = this.cents;
 		classification = IntervalTable.classify(cents, tolerance);
@@ -572,8 +623,12 @@ USAGE:  a_prime.primeHarmonics(highest_harmonic)
 			},
 			\prime, { // reduce by max prime factor
 				res = classification.collect{|x,i|
-						x.reject{|y|  (y[0][0].factors.maxItem > maxPrime) or:
-									(y[0][1].factors.maxItem > maxPrime)  }
+						x.reject{|y| 
+							var p = y[0][0].factorsHarmonic, q = y[0][1].factorsHarmonic;
+/*							((p.maxItem.isNil) or: (q.maxItem.isNil)) or: {*/
+								(p.maxItem > maxPrime) or: (q.maxItem > maxPrime)  
+/*							}*/
+						}
 				}
 			},
 			{^"Invalid type!"}
@@ -607,7 +662,7 @@ USAGE:  a_prime.primeHarmonics(highest_harmonic)
 		 	},
 	 		\prime, {
 		 		max = max ? 19; 
-		 		maxPrime = max
+		 		maxPrime = max;
 		 	}
 	 	);
 	 	candidates = this.analyseScale(tolerance, type, maxNum, maxDenom, maxPrime, false);
@@ -615,7 +670,7 @@ USAGE:  a_prime.primeHarmonics(highest_harmonic)
 			if (x.size == 1) {	
 				x[0][0]
 			}{
-				harms = x.collect{|y| y[0]};		
+				harms = x.collect{|y| y[0]};	
 				metric.mostHarmonic(harms)
 			};
 		};
@@ -680,3 +735,29 @@ USAGE:  a_prime.primeHarmonics(highest_harmonic)
 /*	
 	TO DO: indispensibility for meters
 */
++ Integer {
+	factorsHarmonic {
+		var num, array, prime;
+// the reason to hack this into a mathematically incorrect factorization is beacuse it 
+// saves a ton of work dealing with prime filtering in harmonic ratios:
+//		if(this <= 1) { ^[] }; // no prime factors exist below the first prime
+		num = this.abs;
+		// there are 6542 16 bit primes from 2 to 65521
+		6542.do {|i|
+			prime = i.nthPrime;
+			while { (num mod: prime) == 0 }{
+				array = array.add(prime);
+				num = num div: prime;
+				if (num == 1) {^array}
+			};
+			if (prime.squared > num) {
+				array = array.add(num);
+				^array
+			};
+		};
+		// because Integer is 32 bit, and we have tested all 16 bit primes,
+		// any remaining number must be a prime.
+		array = array.add(num);
+		^array
+	}
+}

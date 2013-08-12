@@ -50,8 +50,8 @@ Dissonance {
 		intervals 	= Array.newClear; 
 		roughness 	= Array.newClear; 
 		dcurve 		= Array.newClear;
-		partials 		= Array.newClear; 
-		info 	 	= ();
+		partials 	= Array.newClear; 
+		info 	 		= ();
 	}
 	
 	*make { |f, a, start = 0.99, end = 2.01, inc = 0.01, method = \parncutt, max = false|
@@ -65,10 +65,9 @@ Dissonance {
 			\sethares, {diss.interval(f,a,start,end,inc)  },
 			{^"Invalid method" }
 		); 
-		diss.scale = diss.minima(diss.dcurve);  // .round(inc)??
-		diss.scale2 = diss.minima2(diss.dcurve);
+		diss.scale = diss.minima(diss.dcurve); 
+//		diss.scale2 = diss.minima2(diss.dcurve);
 		diss.ratios = diss.scale.asRatio(inc.reciprocal, false); // a first crude approximation
-//		diss.harmonicity = diss.ratios.harmonicity;
 		diss.cents = diss.scale.cents; 
 		^diss;	
 	}
@@ -86,9 +85,7 @@ Dissonance {
 			{^"Invalid method"}
 		);
 		diss.scale = diss.minima(diss.dcurve).round(inc);
-//		diss.scale2 = diss.minima2(diss.dcurve);
 		diss.ratios = diss.scale.asRatio(inc.reciprocal, false); // a first crude approximation
-//		diss.harmonicity = diss.ratios.harmonicity;
 		diss.cents = diss.scale.cents;
 		^diss;
 	}		
@@ -104,7 +101,7 @@ Dissonance {
 		if (metric.class != HarmonicMetric) {metric = HarmonicMetric(metric)};
 		this.metric = metric;
 		if (post) {postf("Old ratios: %\n", this.ratios.ratioPost)};
-		this.ratios = this.ratios.rationalize(tolerance, metric, type, max);
+		this.ratios = this.scale.rationalize(tolerance, metric, type, max);
 		this.harmonicity = metric.value(this.ratios);	
 		this.pitchSet = PitchSet.with(this.ratios, unisonvector); 
 		if (post) {	
@@ -201,7 +198,6 @@ Dissonance {
 	}
 	
 	plot { var view;
-//	hacer un view encima de este donde se pongan los ratios en su lugar y en colores segun su tipo 
 		view = Plotter.new("dissonance curve", Rect(780, 456, 500, 300));
 		view.value = this.dcurve;
 		view.specs = [this.dcurve.minItem, this.dcurve.maxItem, \exp, 0.0, 0, " "].asSpec;
@@ -223,7 +219,6 @@ Dissonance {
 	}
 	
 // filter scales by eliminating ratios with a maximum prime factor
-
 // (should factor a single prime from the ratos, not all greater than)
 	factor {|maxPrime = 7| 
 			this.ratios = this.ratios.reject{|x| 
@@ -413,10 +408,8 @@ Dissonance {
 	
 
 // The following methods are experimental: 
-// what would a cents to ratio method look like?	
 // sweep roughness measure by iterating through a list of rationals, 
 // parncutt method (amps should be in sones) 
-
 	rationalRoughness {|f, s, ratioList | var ratios;
 		f = f ? partials[0];
 		s = s ? partials[1]; 
@@ -462,7 +455,7 @@ Dissonance {
 TO DO:
 
 /*
-
+a maxima method for obtaining the roughest intervals
 */
 
 Dissonance: (2006-2008) jsl

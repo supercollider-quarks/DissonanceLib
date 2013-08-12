@@ -28,7 +28,7 @@
 		var idx, order, resF = [], resM = [], temp = this.deepCopy;
 		n.do{|i|
 			idx = temp[1].indexOf(temp[1].maxItem);
-//			[idx, temp[1][idx], temp[0][idx]].postln;
+			[idx, temp[1][idx], temp[0][idx]].postln;
 			resF = resF.add(temp[0].removeAt(idx));
 			resM = resM.add(temp[1].removeAt(idx));
 		};

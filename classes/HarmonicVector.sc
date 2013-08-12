@@ -26,8 +26,7 @@ HarmonicVector{
 		if (this.functions != "") {
 			stream << ", " << this.functions << ")\n"
 		}{ stream << ")"}
-	}		
-
+	}
 	
 	*with {|reduced| var hv = this.new; 
 		hv.reduced = reduced;
@@ -42,7 +41,6 @@ HarmonicVector{
 		hv.adjustOctave;
 		^hv.getFunctions;
 	}
-	
 	
 	// harmonic measures: 
 	magnitude { ^this.vector.norm }
@@ -231,7 +229,7 @@ HarmonicVector{
 
 	asHvector{ ^this.collect{|x| HarmonicVector.from(x) } }
 	
-	ratioToVector{ ^this.collect{|x| HarmonicVector.from(x) } }
+	ratioToVector{ ^HarmonicVector.from(this) }
 	
 	toHvector{ ^this.collect{|x| HarmonicVector.with(x) } }
 	
