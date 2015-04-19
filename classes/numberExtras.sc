@@ -252,6 +252,32 @@ USAGE:  a_prime.primeHarmonics(highest_harmonic)
 		if (reduce) {^div.reduceRatio}{^div}
 	}
 	
+		ratioMul {|that|
+		^[this[0] * that[0], this[1] * that[1]].reduceRatio	} 
+	
+	ratioAdd {|that| var denom, sum;
+		if (this[1] != that[1]) {
+			denom = lcm(this[1],that[1]);
+			sum = (this[1] * that[0]) + (that[1] * this[0])
+		}{
+			sum = this[0] + that[0];
+			denom = this[1];
+		}
+		^[sum, denom].reduceRatio
+	} 
+
+	ratioSub {|that| var denom, diff;
+		if (this[1] != that[1]) {
+			denom = lcm(this[1],that[1]);
+			diff = (that[1] * this[0]) - (this[1] * that[0]);
+		}{
+			diff = this[0] - that[0];
+			denom = this[1];
+		};
+		^[diff, denom].reduceRatio
+	} 
+
+	
 	// express a rational as [p,q] where p and q are coprime:
 	reduceRatio { ^this div: (this[0] gcd: this[1]) }
 
