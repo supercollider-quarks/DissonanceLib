@@ -7,17 +7,19 @@ IntervalTable {
 	 method *loadTable is used to load them with arguments \huygens or \JST, if \JST is the case,
 	 an additional argument for minimum harmonicity should be provided (\030, \035, \040, \045 or
 	 \050)
-	 
-*/	
+
+*/
 	classvar <table, <>tableType, <>tableMin;
-	
+
 	*initClass {
+		Class.initClassTree(Quarks);
 		IntervalTable.loadTable;
 	}
-	
+
 	*loadTable {|type = \JST, min = \030, path |
 		var ark, filename;
-		path = path ?? {Platform.userAppSupportDir ++ "/quarks/DissonanceLib/"};
+		// path = path ?? {Platform.userAppSupportDir ++ "/quarks/DissonanceLib/"};
+		path = path ?? {Quarks.installed.detect{|q| q.name == "DissonanceLib"}.localPath};
 		tableType = type;
 		if (type == \huygens) {tableMin = nil} {tableMin = min};
 		type.switch(
@@ -25,13 +27,13 @@ IntervalTable {
 			\JST, { filename = "JSTList" ++ min ++ ".int" },
 			{^"Invalid type"}
 		);
-		ark = ZArchive.read(path ++ filename);
+		ark = ZArchive.read(path +/+ filename);
 		table = ark.readItem;
-		ark.close;	
+		ark.close;
 		^"table " ++ filename ++ " loaded...";
 	}
-	
-	
+
+
 	*classify {|centsList, tolerance = 6| // in cents
 		var result = Array.newClear(centsList.size), key;
 		key = tableType.switch(\JST, \harmon, \huygens, \names);
