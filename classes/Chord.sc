@@ -1,3 +1,4 @@
+// requires quark miSCellaneous_lib 0.24.0
 Chord {
 
 	var <>notes;
@@ -23,8 +24,8 @@ Chord {
 	}
 
 
-	// harmonic distance (Cubarsi, 2019)
-	harmonicDistance { |max = 50|
+	// harmonic dissonance (Cubarsi, 2019: 'Harmonic distance in intervals and chords')
+	harmonicDissonance { |max = 50|
 		var freqs, freqs_norm_fraction, freqs_norm_ratio, error, p, q, p_lcm, p_gcd, q_lcm, q_gcd, d;
 
 		freqs_norm_fraction = this.asFraction(max);
