@@ -9,7 +9,7 @@ Chord {
 
 	asFraction { |max = 50|
 		this.freqs = this.notes.midicps;
-		this.freqs_norm_fraction = (this.freqs/this.freqs[0]).asFraction(max).postln; // normalize by base note
+		this.freqs_norm_fraction = (this.freqs/this.freqs[0]).asFraction(max); // normalize by base note
 		^this.freqs_norm_fraction;
 	}
 
@@ -43,5 +43,12 @@ Chord {
 
 		^d = (p_lcm/p_gcd).log2.reduce('+') + (q_lcm/q_gcd).log2.reduce('+'); // distance according to Cubarsi, 2019
 	}
+
+	*harmonicDissonance { |notes|
+		var c;
+		c = super.new.notes = notes;
+		^c.harmonicDissonance();
+	}
+
 
 }
