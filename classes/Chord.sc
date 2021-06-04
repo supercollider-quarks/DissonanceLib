@@ -11,7 +11,7 @@ Chord {
 		^this.notes;
 	}
 
-	asFraction { |max = 50|
+	asFraction { |max = 10|
 		var freqs_norm;
 		this.freqs = this.notes.midicps;
 		freqs_norm = (this.freqs/this.freqs[0]);
@@ -35,6 +35,10 @@ Chord {
 	harmonicDissonance { |max = 50|
 		var freqs, freqs_norm_fraction, freqs_norm_ratio, error, p, q, p_lcm, p_gcd, q_lcm, q_gcd, d;
 
+		if (notes.size == 0,
+			{^0;},
+			{
+
 		freqs_norm_fraction = this.asFraction(max);
 		freqs = this.freqs;
 
@@ -43,12 +47,15 @@ Chord {
 		q = freqs_norm_fraction.collect({|f| f[1]}); // denominators
 
 		// Note: lcm silently overflows the 32-bit integer range, so instead use factors
-		p_lcm = p.lcmByFactors[1]; // .reduce(\lcm).postln;
+		p_lcm = p.lcmByFactors; // .reduce(\lcm).postln;
+		if (p_lcm.isNumber, {p_lcm = [p_lcm];}, {p_lcm = p_lcm[1];});
 		p_gcd = p.reduce(\gcd);
-		q_lcm = q.lcmByFactors[1]; // reduce(\lcm).postln;
+		q_lcm = q.lcmByFactors; // reduce(\lcm).postln;
+		if (q_lcm.isNumber, {q_lcm = [q_lcm];}, {q_lcm = q_lcm[1];});
 		q_gcd = q.reduce(\gcd);
 
 		^d = (p_lcm/p_gcd).log2.reduce('+') + (q_lcm/q_gcd).log2.reduce('+'); // distance according to Cubarsi, 2019
+		});
 	}
 
 	*harmonicDissonance { |notes|
@@ -59,7 +66,10 @@ Chord {
 	}
 
 	printOn { | stream |
+		if (this.notes.size > 0, {
 		stream << "Chord( " << this.notes << ", " << this.harmonicDissonance << " )";
+		},
+		{});
     }
 
 }
