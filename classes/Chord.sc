@@ -7,9 +7,16 @@ Chord {
 
 	*new { |notes| ^super.new.notes = notes; }
 
+	asNotes {
+		^this.notes;
+	}
+
 	asFraction { |max = 50|
+		var freqs_norm;
 		this.freqs = this.notes.midicps;
-		this.freqs_norm_fraction = (this.freqs/this.freqs[0]).asFraction(max); // normalize by base note
+		freqs_norm = (this.freqs/this.freqs[0]);
+		//freqs_norm.postln;
+		this.freqs_norm_fraction = freqs_norm.asFraction(max); // normalize by base note
 		^this.freqs_norm_fraction;
 	}
 
@@ -18,8 +25,8 @@ Chord {
 		var freqs_norm_ratio, error;
 
 		// error
-		freqs_norm_ratio = this.freqs_norm_fraction.collect({|f| (f[0].asFloat / f[1])*this.freqs[0] }).postln;
-		error = (this.freqs.cents-freqs_norm_ratio.cents).round(precision).postln;
+		freqs_norm_ratio = this.freqs_norm_fraction.collect({|f| (f[0].asFloat / f[1])*this.freqs[0] });
+		error = (this.freqs.cents-freqs_norm_ratio.cents).round(precision);
 		^error.reduce(\max);
 	}
 
@@ -47,8 +54,12 @@ Chord {
 	*harmonicDissonance { |notes|
 		var c;
 		c = super.new.notes = notes;
+		//c.asFraction.postln;
 		^c.harmonicDissonance();
 	}
 
+	printOn { | stream |
+		stream << "Chord( " << this.notes << ", " << this.harmonicDissonance << " )";
+    }
 
 }
