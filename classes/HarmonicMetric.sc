@@ -42,7 +42,8 @@ HarmonicMetric {
 		^ratios[order]
 	}
 	
-	asString { ^type }	
+	asString { ^type.asString
+	}
 
 }
 
