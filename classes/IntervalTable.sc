@@ -17,7 +17,7 @@ IntervalTable {
 	
 	*loadTable {|type = \JST, min = \030, path |
 		var ark, filename;
-		path = path ?? {Platform.userAppSupportDir ++ "/downloaded-quarks/DissonanceLib/"};
+		path = path ?? {File.realpath(this.class.filenameSymbol).dirname.withTrailingSlash ++ "../"};
 		tableType = type;
 		if (type == \huygens) {tableMin = nil} {tableMin = min};
 		type.switch(
