@@ -19,6 +19,20 @@
 	// basically the same but with different semantics: 
 	// ex. 833.cents2Frq
 	cents2Frq {|frq = 1| ^frq.addCents(this)}
+
+	asNote { var residue, octave, note, roundedNote;
+		note = this.cpsmidi; 
+		roundedNote = note.round(1);
+		octave = ((roundedNote / 12).asInteger) - 1;
+		residue  = (note.frac * 100).round(1);
+		if (residue > 50) {
+			^[NoteNames.flatnames[(roundedNote - 72) % 12].asString ++ octave.asString, 
+				(100 - residue).neg]
+		}{
+			^[NoteNames.names[(roundedNote - 72) % 12].asString ++ octave.asString, 
+				residue];
+		}
+	}
 	
 	// utility to calculate pitch bends for midi playback of microtones
 	// this is in cents, pb is the pitch bend ammount (400 = +- 1 tone, i.e. -200 to +200 cents)
