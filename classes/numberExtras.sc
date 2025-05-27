@@ -19,20 +19,6 @@
 	// basically the same but with different semantics: 
 	// ex. 833.cents2Frq
 	cents2Frq {|frq = 1| ^frq.addCents(this)}
-
-	asNote { var residue, octave, note, roundedNote;
-		note = this.cpsmidi; 
-		roundedNote = note.round(1);
-		octave = ((roundedNote / 12).asInteger) - 1;
-		residue  = (note.frac * 100).round(1);
-		if (residue > 50) {
-			^[NoteNames.flatnames[(roundedNote - 72) % 12].asString ++ octave.asString, 
-				(100 - residue).neg]
-		}{
-			^[NoteNames.names[(roundedNote - 72) % 12].asString ++ octave.asString, 
-				residue];
-		}
-	}
 	
 	// utility to calculate pitch bends for midi playback of microtones
 	// this is in cents, pb is the pitch bend ammount (400 = +- 1 tone, i.e. -200 to +200 cents)
@@ -102,9 +88,6 @@
 
 	// size of wavelength in meters:
 	asWavelength  {|c = 343|  ^c/this } // c is speed of sound in m/s @ 20 celsius	
-	factorial { // the highest factorial that can be represented as a Float is 171
-		^(2..this.asFloat).product
-	}
 	
 /*	Return a sequence of largest prime powers for a given harmonicity minimum. Pitch range is 
 	in octaves, ex, 0.03.minHarmonicityVector(1,13) yields [12, 8, 3, 2, 1, 1]. 
