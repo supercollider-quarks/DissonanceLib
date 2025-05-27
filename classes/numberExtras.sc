@@ -102,9 +102,6 @@
 
 	// size of wavelength in meters:
 	asWavelength  {|c = 343|  ^c/this } // c is speed of sound in m/s @ 20 celsius	
-	factorial { // the highest factorial that can be represented as a Float is 171
-		^(2..this.asFloat).product
-	}
 	
 /*	Return a sequence of largest prime powers for a given harmonicity minimum. Pitch range is 
 	in octaves, ex, 0.03.minHarmonicityVector(1,13) yields [12, 8, 3, 2, 1, 1]. 
