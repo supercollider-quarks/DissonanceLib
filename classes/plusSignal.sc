@@ -1,25 +1,25 @@
-+ Array 
++ Array
 {
 // these methods are helpful for combining Dissonance with FFT data
 
 	asFreqMag { |win, sr |
 		var resF = [], resM = [], bw;
 		sr ?? {Server.default.sampleRate / 2};
-		win ?? {this.size};	
+		win ?? {this.size};
 		bw = sr/win;
 		this.reverseDo{|mag, i|
-			resF = resF.add(bw * i); 
+			resF = resF.add(bw * i);
 			resM = resM.add(mag);
 		}
 		^[resF, resM.reverse]
 	}
-	
+
 	asFreqMagPhase {|phases, win, sr|
 		sr ?? {Server.default.sampleRate/2};
 		win ?? {this.size};
-		
-		
-			
+
+
+
 	}
 
 // return the n highest partials
@@ -28,12 +28,12 @@
 		var idx, order, resF = [], resM = [], temp = this.deepCopy;
 		n.do{|i|
 			idx = temp[1].indexOf(temp[1].maxItem);
-			[idx, temp[1][idx], temp[0][idx]].postln;
+			[idx, temp[1][idx], temp[0][idx]];
 			resF = resF.add(temp[0].removeAt(idx));
 			resM = resM.add(temp[1].removeAt(idx));
 		};
 			if (sort) {
-				order = resF.order; 
+				order = resF.order;
 				^[resF[order], resM[order]]
 			}{
 				^[resF, resM]
@@ -43,9 +43,9 @@
 	maxima { // for working with arrays of [freq, mag] and operating on mags!
 		var temp = this.deepCopy, gradient = temp[1].differentiate,
 		prev = gradient.first, res = [], max = [[],[]];
-		gradient.do{|a| 
+		gradient.do{|a|
 			if (a.sign != prev.sign) //changes in sign indicating changes in curvature
-			{ 
+			{
 				res = res.add(gradient.indexOf(a) - 1);				prev = a;
 			}
 		};
@@ -53,18 +53,18 @@
 			if (temp[1][r] > temp[1].wrapAt(r-1)) //check to the left
 				{
 					max[0] = max[0].add(temp[0][r]);
-					max[1] = max[1].add(temp[1][r]); 
+					max[1] = max[1].add(temp[1][r]);
 				}
 			};
 		if (max[0].isEmpty) {max = [ [0], [0] ]};
-		^max			
+		^max
 	}
 
 	// linear interpolation between 2 arrays; ammount from 0 = first array to 1 = second array
 	interpolate2 {|that, ammount = 0.5|  ^((1-ammount) * this) + (ammount * that) }
-	
+
 	// interpolation between 3 arrays, low (= this), mid and high
-	interpolate3 { |mid, high, ammount| var res; 
+	interpolate3 { |mid, high, ammount| var res;
 			if (ammount < 0)
 //				{ res = this.interpolate2(mid, ammount + 1) }
 //				{ res = mid.interpolate2(high, ammount) };
@@ -73,7 +73,7 @@
 				{ ^mid.interpolate2(high, ammount) };
 	}
 
-}		
+}
 
 + Signal {
 
@@ -85,14 +85,14 @@
 //		if (normalize) {
 //				spectrum = spectrum * spectrum.collect(_.maxItem).maxItem.reciprocal;
 //		};
-		
+
 //		freqAmps  = spectrum.asFreqMag;
-//		^freqAmps.findNlargest(max, sort)		
-		
+//		^freqAmps.findNlargest(max, sort)
+
 	}
-	
-	
-//	analyseFileN {|path = nil, wSize = 128, ovlp = 64, wType = \hammingWindow, 
+
+
+//	analyseFileN {|path = nil, wSize = 128, ovlp = 64, wType = \hammingWindow,
 //				max = 10, normalize = true, sort = true|
 //		var spectrum, freqAmps, file, size, signal, array, res;
 //		path ?? {
@@ -107,17 +107,17 @@
 //			array = FloatArray.newClear(size);
 //			file.readData(array);
 //		};
-//		file.close; 
+//		file.close;
 //		signal = Signal.newFrom(array);
 //		spectrum = signal.stft(wSize, ovlp, wType);
 //		if (normalize) {
 //				signal = signal * signal.collect(_.maxItem).maxItem.reciprocal;
 //		};
-//		
+//
 //		freqAmps  = spectrum.asFreqMag;
 ////		freqAmps[1]  = freqAmps[1].reverse;
-//		^freqAmps.findNlargest(max, sort)		
-//		
+//		^freqAmps.findNlargest(max, sort)
+//
 //	}
 
 
