@@ -179,7 +179,7 @@ code::
 ::
 
 subsection::bintodb(zeta = 8)
-			Convert the magnitude of an fft bin to dB. Implemented according to a formula found in the PhD Thesis of Nick Collins; zeta is a calibration factor. Its value is 184262 in the formula, but from my experience, for practical purposes a value of 8 works well with SC's PV_MagBuffer and PV_FreqBuffer (see the topic link::Guides/LiveDissonance::).
+Convert the magnitude of an fft bin to dB. Implemented according to a formula found in Nick Collins PhD Thesis. zeta is a calibration factor. Its value is 184262 in the formula, but from my experience, for practical purposes a value of 8 works well with SC's PV_MagBuffer and PV_FreqBuffer (see the topic link::Guides/LiveDissonance::).
 
 code::
 3.bintodb;
@@ -223,10 +223,10 @@ Some of these methods are also implemented for SequenceableCollection
 
 
 subsection::indigestibility
-Barlow's indigestibility of an integer. A measure of how a number may be psychologically 'digestible' according to its prime factors. See Barlow, C, "Two Essays on Theory", Computer Music Journal, 1987. It is rarely used on its own but is the basis for the harmonicity function.
+Barlow's indigestibility of an integer. A measure of how a number may be psychologically 'digestible' according to its prime factors. See Barlow, C, "Two Essays on Theory", Computer Music Journal, 1987.It is rarely used on its own but is the basis for the harmonicity function.
 
 
-Formula
+Formula::
 
 math::
 \xi(\mathcal{N}) = 2 \sum_{r=1}^{\infty}  \left ( \frac{ n_{r}(p_{r} -1)^2}{p_{r}} \right)
@@ -244,9 +244,9 @@ math::
 ::
 
 math::
+
 p \in prime
 ::
-
 
 Example:
 code::
@@ -266,7 +266,6 @@ math::
 	}{
 		\xi(\mathcal{Q}) + \xi(\mathcal{P}) }
 ::
-
 
 
 Negative polarity means that the interval is weighted towards its upper tone and not towards its lower tone, as with a positive value. As an example, a perfect fifth has its 'weight' on the lower tone, while its inverse, a perfect fourth, has its weight on the highest tone. The absolute value of a harmonicity is called harmonic intensity.
@@ -528,7 +527,6 @@ a = f_{a}/\gcd{(f_{a}, f_{b})}, \: b = f_{b}/\gcd{(f_{a}, f_{b})}, \: \textrm{an
 ::
 
 
-
 code::
 [4,3].harmonicDistance;
 [[1,1], [5,4], [3,2]].harmonicDistance; // -> [ 0, 2.995732273554, 1.7917594692281 ]
@@ -556,6 +554,7 @@ math::
 \Gamma(a \cdot b)
 ::
 
+
 code::
 [4,3].gradusSuavitatis;
 [[1,1], [5,4], [3,2]].gradusSuavitatis;
@@ -563,10 +562,16 @@ code::
 // -> [ 1, 8, 7, 5, 4, 7, 10, 2 ] notice how the GS of [5,4] and [5,3] is the same
 ::
 
-
-
 subsection::gradusSuavitatisN
 Degree of sweetness of a scale or chord.
+
+Formula:
+
+math::
+\Gamma(\textrm{lcm}(a_{1},a_{2},...,a_{n}))
+::
+
+where the math:: a_{1}...a_{n}:: are the notes of a chord or scale expressed as harmonics (see ratiosToHarmonics) and math::\textrm{lcm}:: is the least common multiple of those numbers.
 
 code::
 [[1,1], [5,4], [3,2]].gradusSuavitatisN;

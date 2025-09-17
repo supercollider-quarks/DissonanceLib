@@ -3,4 +3,104 @@ summary:: Not yet written
 categories:: DissonanceLib
 related:: Classes/PitchSet, Classes/HarmonicVector, Classes/HarmonicMetric, Classes/IntervalTable, Classes/LoudnessModel, Overviews/numberExtras
 
-DESCRIPTION::Will get to this shortly. Thanks.
+DESCRIPTION::A class made for calculating loudness from Equal Loudness contours (also known as Fletcher/Mundson curves). It also has class methods for calculating masking and audibility.
+
+The best way to use it is with convenience methods from link::Overviews/numberExtras:: such as phonToSone, soneToPhon, asPhon, asSone and asDynamic. See below.
+
+On its own
+Usage: LoudnessModel.calc(freq, spl) returns the phon value for a certain frequency in Hz and intensity in dB SPL.
+
+EXAMPLES::
+
+subsection::phonToSone
+Convert from phons to sones. http://en.wikipedia.org/wiki/Phon
+
+code::
+[40,50,60,70,80,90].phonToSone
+::
+
+subsection::soneToPhon
+Convert sones to phons. http://en.wikipedia.org/wiki/Sone
+
+code::
+Array.geom(6,1,2).soneToPhon;
+::
+
+subsection::asPhon(spl, calib = 0)
+Return the value in phons for a frequency at a certain db SPL level. Calib should be 0 if loudness is in dB SPL; a positive number if the values are in dBFS (dB's with respect to a full scale sine wave); or negative dB's relative to 0 which is the case when translating from amplitude value to dB with ampdb.
+
+code::
+100.asPhon(100); // at 100Hz, 100dB is heard as 90.588dB
+::
+
+subsection::asSone(spl, calib = 0)
+Return the value in sons for a frequency at a certain db SPL level. Calib should be 0 if loudness is in dB SPL; a positive number if the values are in dBFS (dB's with respect to a full scale sine wave); or negative dB's relative to 0 which is the case when translating from amplitude value to dB with ampdb.
+
+code::
+100.asSone(100); // 100Hz@100dB sounds perceptually as 33.33 sones
+::
+
+subsection::asDynamic(freq, ref = 100, fff = 3)
+Returns a symbol expressing the dynamic value (ppp-fff) of an amplitude and frequency. The number should be an amplitude; it is converted to dBFS, then phon, sone and musical dynamics. The reference value is 100, which assumes that the amplitude value of 1.0  at 1000Hz will translate to 64 sones, equivalent to fff (see also LoudnessModel).
+
+The upper boundary for sones is 64 because equal loudness contours stop at 100 phons. The fff argument is there to adjust how many f's correspond to 64 sones. The default of 3 is subtracted from 6, which is the  	power of two of 64, yielding 3f's. If it is less than 3, more f's will correspond to that maximum dynamic.
+
+According to one's needs, values can go from, say,  ppppp-fffff.
+
+Examples:
+
+code::
+1.0.asDynamic(100); 	// full code sine wave at 100Hz -> ff
+1.0.asDynamic(50) ; 	// only perceived as f an octave lower
+1.0.asDynamic(500) ; 	// and fff at 500Hz
+
+// descending scale of amplitudes in relation to 5000Hz:
+Array.geom(10, 1.0, 0.35).round(0.0001).postln.asDynamic(5000);
+// and in relation to 440Hz:
+Array.geom(10, 1.0, 0.35).asDynamic(440);
+::
+
+For arrays of amps and freqs, you can use an array (of the same size as the amp array) for the freq arg:
+
+code::
+// a series o frequencies in relation to 0.5 amp
+// (like the representation in musical notation of an equal loudness curve)
+({0.5}!25).asDynamic(Array.geom(25,20000, 0.75).round(0.1).postln);
+// the dynamic curve is shifted so that 64 sones is fffff:
+({0.5}!25).asDynamic(Array.geom(25,20000, 0.75).round(0.1).postln, 100, 1);
+// random amps and freqs:
+({rrand(0.0001, 0.1)}!8).round(0.001).postln.asDynamic(({rrand(50,2000)}!8).postln);
+::
+
+section::Masking
+
+The following methods work with arrays of pairs of frecuencies and intensities [freq, spl]:
+
+subsection::asPhon
+Return the values in phons of arrays of [freq, spl] pairs.
+
+code::
+[100, 100].asPhon;
+[ [80,100], [160, 100], [320, 100], [640,100] ].asPhon;
+::
+
+subsection::asSone
+Return the values in sones of arrays of [freq, spl] pairs.
+
+code::
+[100, 100].asSone;
+[ [80,100], [160, 100], [320, 100], [640,100] ].asSone;
+::
+
+subsection::compensateMasking(gradient = 12)
+Returns the amplitudes of partials after masking.
+
+Values are input as arrays of [spl, freq] pairs.
+
+code::
+[ [80,100], [160, 100], [320, 100],[640,100] ].compensateMasking.round(0.001);
+// -> [ 98.326, 98.084, 99.435, 100 ], meaning that after masking each is slightly lower
+[ [440,100], [554.36, 100], [659.25, 100], [783.99, 100] ].compensateMasking.round(0.001);
+
+[ Array.series(3, 69, 2).midicps.round(0.001), 100!3].flop.compensateMasking.round(0.001)
+::

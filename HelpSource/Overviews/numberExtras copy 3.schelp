@@ -14,7 +14,7 @@ section:: Additions to SimpleNumber
 
 
 Some of these methods also work for collections of numbers, as implemented in SequenceableCollection
-
+/*
 subsection::cents
 Return the value of a frequency interval in cents:
 
@@ -179,7 +179,7 @@ code::
 ::
 
 subsection::bintodb(zeta = 8)
-			Convert the magnitude of an fft bin to dB. Implemented according to a formula found in the PhD Thesis of Nick Collins; zeta is a calibration factor. Its value is 184262 in the formula, but from my experience, for practical purposes a value of 8 works well with SC's PV_MagBuffer and PV_FreqBuffer (see the topic link::Guides/LiveDissonance::).
+Convert the magnitude of an fft bin to dB. Implemented according to a formula found in Nick Collins PhD Thesis. zeta is a calibration factor. Its value is 184262 in the formula, but from my experience, for practical purposes a value of 8 works well with SC's PV_MagBuffer and PV_FreqBuffer (see the topic link::Guides/LiveDissonance::).
 
 code::
 3.bintodb;
@@ -223,11 +223,11 @@ Some of these methods are also implemented for SequenceableCollection
 
 
 subsection::indigestibility
-Barlow's indigestibility of an integer. A measure of how a number may be psychologically 'digestible' according to its prime factors. See Barlow, C, "Two Essays on Theory", Computer Music Journal, 1987. It is rarely used on its own but is the basis for the harmonicity function.
+Barlow's indigestibility of an integer. A measure of how a number may be psychologically 'digestible' according to its prime factors. See Barlow, C, "Two Essays on Theory", Computer Music Journal, 1987.It is rarely used on its own but is the basis for the harmonicity function.
 
 
-Formula
-
+Formula::
+/*
 math::
 \xi(\mathcal{N}) = 2 \sum_{r=1}^{\infty}  \left ( \frac{ n_{r}(p_{r} -1)^2}{p_{r}} \right)
 ::
@@ -244,10 +244,10 @@ math::
 ::
 
 math::
+
 p \in prime
 ::
-
-
+*/
 Example:
 code::
 // see how primes are much more indigestible than composites
@@ -257,6 +257,7 @@ code::
 subsection::harmonicity
 Barlow's harmonicity formula for an interval P/Q. It is the reciprocal of the sum of the indigestibilties of P and Q, with its sign indicating the interval's polarity.
 
+/*
 math::
 \mathcal{H(P,Q)} =
 \frac{
@@ -267,8 +268,7 @@ math::
 		\xi(\mathcal{Q}) + \xi(\mathcal{P}) }
 ::
 
-
-
+*/
 Negative polarity means that the interval is weighted towards its upper tone and not towards its lower tone, as with a positive value. As an example, a perfect fifth has its 'weight' on the lower tone, while its inverse, a perfect fourth, has its weight on the highest tone. The absolute value of a harmonicity is called harmonic intensity.
 
 The harmonicity of 1/1 is infinite. There is a flag (clean = true) in the implementation of harmonicity for collections that is used for setting the harmonicity of 1/1 to 2 instead of NaN.
@@ -518,7 +518,7 @@ James Tenney's harmonic distance. Defined as a city-block metric of harmonic lat
 
 Formula for Harmonic Distance math::HD:: of a frequency ratio math::f_{a} / f_{b}::
 :
-
+/*
 math::
   HD(f_{a}, f_{b})  \varpropto \log{(a)} + \log{(b)} = \log{(a \cdot b)}
 ::
@@ -526,8 +526,7 @@ where:
 math::
 a = f_{a}/\gcd{(f_{a}, f_{b})}, \: b = f_{b}/\gcd{(f_{a}, f_{b})}, \: \textrm{and} \; a \ge b
 ::
-
-
+*/
 
 code::
 [4,3].harmonicDistance;
@@ -538,7 +537,7 @@ subsection::gradusSuavitatis
 Leonhard Euler's emphasis::Gradus Suavitatis:: (or degree of softness, 1739). Similar to Barlow's harmonicity in that it deals with divisibility (primes) as a measure of harmonic concordance, but with the disadvantage of giving the same measures for different intervals. (See John Chalmers, "Divisions of the Tetrachord").
 
 The emphasis::Gradus Suavitatis:: math::\Gamma:: of an number math::a:: is:
-
+/*
 math::
 \Gamma{(a)} = 1 + \sum_{k = 1}^{n} e_{k}(p_{k} - 1)
 ::
@@ -555,6 +554,7 @@ The emphasis::Gradus Suavitatis:: of a ratio math:: a/b:: is:
 math::
 \Gamma(a \cdot b)
 ::
+*/
 
 code::
 [4,3].gradusSuavitatis;
@@ -563,10 +563,16 @@ code::
 // -> [ 1, 8, 7, 5, 4, 7, 10, 2 ] notice how the GS of [5,4] and [5,3] is the same
 ::
 
-
-
 subsection::gradusSuavitatisN
 Degree of sweetness of a scale or chord.
+
+Formula:
+
+math::
+\Gamma(\textrm{lcm}(a_{1},a_{2},...,a_{n}))
+::
+
+where the math:: a_{1}...a_{n}:: are the notes of a chord or scale expressed as harmonics (see ratiosToHarmonics) and math::\textrm{lcm}:: is the least common multiple of those numbers.
 
 code::
 [[1,1], [5,4], [3,2]].gradusSuavitatisN;
@@ -621,3 +627,4 @@ A shortcut for removing duplicate items in a collection (does not preserve order
 code::
 [1,2,3,4,3,6,3,7].removeDuplicates
 ::
+*/
