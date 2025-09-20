@@ -4,16 +4,16 @@ HarmonicMetric {
 
 	*new {|metric|
 		metric = metric ? \harmonicity;
-		^super.new.type = metric.asString}
+		^super.newCopyArgs(type: metric)
+	}
 
 	value {|ratios|
-		if ((ratios.size == 2) and: (ratios[0].isNumber)) {
-			type.switch(
-				"harmonicity", 		{^ratios.harmonicity.abs  },
-				"harmonicDistance",		{^ratios.harmonicDistance },
-				"gradusSuavitatis",		{^ratios.gradusSuavitatis }
-/*				\magnitiude, 			{^ratios.asHvector.magnitude }*/
-			)
+		if ( ratios.size == 2 and: ratios.first.isNumber ) {
+			switch(type)
+    			{\harmonicity} 		            {^ratios.harmonicity.abs  }
+				{\harmonicDistance}		    {^ratios.harmonicDistance }
+				{\gradusSuavitatis}		    {^ratios.gradusSuavitatis }
+/*				{\magnitiude} 			{^ratios.asHvector.magnitude } */
 		}{
 			^ratios.collect{|x| this.value(x)  }
 		}
@@ -21,7 +21,7 @@ HarmonicMetric {
 
 	mostHarmonic {|ratios| var res;
 		res = this.value(ratios);
-		if (type == "harmonicity") {
+		if (type == \harmonicity) {
 			^ratios[res.indexOf(res.maxItem)];
 		};
 		^ratios[res.indexOf(res.minItem)];
@@ -29,7 +29,7 @@ HarmonicMetric {
 
 	leastHarmonic {|ratios| var res;
 		res = this.value(ratios);
-		if (type == "harmonicity") {
+		if (type == \harmonicity) {
 			^ratios[res.indexOf(res.minItem)];
 		};
 		^ratios[res.indexOf(res.maxItem)];
@@ -38,11 +38,11 @@ HarmonicMetric {
 	order {|ratios| var res, order;
 		res = this.value(ratios);
 		order = res.order;
-		if (type == "harmonicity") {order = order.reverse};
+		if (type == \harmonicity) {order = order.reverse};
 		^ratios[order]
 	}
 
-	asString { ^type }
+	asString { ^type.asString }
 
 }
 
