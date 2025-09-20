@@ -1,6 +1,53 @@
 TITLE:: IntervalTable
-summary:: Not yet written
+summary:: Auxiliary class.
 categories:: DissonanceLib
 related:: Classes/PitchSet, Classes/HarmonicVector, Classes/HarmonicMetric, Classes/IntervalTable, Classes/LoudnessModel, Overviews/numberExtras
 
-DESCRIPTION::Will get to this xortly. Thanks very mucx.
+DESCRIPTION::A table of intervals helpful for classifying and naming microtonal intervals. Used in rationalization (see link::Overviews/numberExtras::).
+
+There are two kinds of interval tables: one obtained from the Huygens-Fokker Foundation,
+link::http://www.huygens-fokker.org/docs/intervals.html::, with 356 intervals inside an octave; or 5 tables generated with the program JST for the Atari ST by Clarence Barlow (see link::https://www.musikinformatik.uni-mainz.de/Autobusk::). Each table contains ratios generated within a minimum harmonicity value and encompassing 9 octaves above and below unison (+/- 10800 cents). (See Barlow, "Two Essays on Theory", Computer Music Journal, 1987).
+
+
+
+CLASSMETHODS::
+
+METHOD:: loadTable
+load the table into the class.
+
+argument:: type
+A symbol. Either \huygens or \JST.
+argument:: min
+If type is \JST, an additional argument for minimum harmonicity should be provided (\030, \035, \040, \045 or \050)
+argument::path
+in case one wants to load a table from a custom path. For this, you can explore the interval tables in the class folder of this extension: huygensList.int and JSTList0X0.int
+
+METHOD::classify
+From the current loaded interval table, return an array of intervals and their properties (ratio, size in cents and name/harmonicty) that fall within a tolerance range from a list of intervals.
+argument:: centsList
+A list of cent values out of which the classification will be done.
+argument::tolerance
+Tolerance range in cents (+/- from  a value).
+
+EXAMPLES::
+
+Use case examples:
+code::
+
+//IntervalTable is not used directly:
+IntervalTable.classify([20, 100, 150, 350, 600]).flatten.do{|x|if (x.notNil) {postf("ratio: %,\t cents: %\t %\n", x[0].ratioPost, x[1].round(0.01), x[2])}};
+
+// for that there are aconvinience methods:
+[0, 50, 100, 500].centsToName; // outputs a list of interval ratios, cents and names from the Huygens-Fokker list
+[[1,1], [12,11], [32,27], [4,3], [3,2], [18,11], [16,9], [2,1]].ratioToName;
+
+// these examples are taken from the number extras helpfile:
+[1.0, 1.125, 1.333, 1.37, 1.67, 1.87, 1.91, 2.1].analyseScale; // values are in decimal frequency ratios
+
+// rationalization uses analyseScale which in turn uses IntervalTable, classify.
+// This examples shows the distinctions produced by different harmonic measures:
+[1.125, 1.265625, 1.333, 1.36].rationalize(12, \harmonicDistance);
+[1.125, 1.265625, 1.333, 1.36].rationalize(12, \harmonicity);
+[1.125, 1.265625, 1.333, 1.36].rationalize(12, \gradusSuavitatis);
+
+::
