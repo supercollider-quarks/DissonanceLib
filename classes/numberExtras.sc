@@ -107,19 +107,23 @@
 
 	// size of wavelength in meters:
 	asWavelength  {|c = 343|  ^c/this } // c is speed of sound in m/s @ 20 celsius
-	// factorial { // the highest factorial that can be represented as a Float is 171
+
+  // factorial { // the highest factorial that can be represented as a Float is 171
 	// 	^(2..this.asFloat).product
 	// }
 
-/*	Return a sequence of largest prime powers for a given harmonicity minimum. Pitch range is
-	in octaves, ex, 0.03.minHarmonicityVector(1,13) yields [12, 8, 3, 2, 1, 1].
+	
+	
+/*	Return a sequence of largest prime powers for a given harmonicity minimum. Pitch range is 
+	in octaves, ex, 0.03.minHarmonicityVector(1,13) yields [12, 8, 3, 2, 1, 1]. 
 	They correspond to the powers of the harmonic space bases 2,3,5,7,11,and 13 inside an octave.
 	"A maximum powers sequence includes intervals, the harmonicities of which may lie
 	below the minimum suggested [by this method]...The maximum power sequence guarantees merely
 	that all intervals that are more harmonic than a given minimum [harmonicity] value can be
 	expressed by the sequence. [12, 8, 3, 2, 1, 1] results in as many as 3,964 different intervals
-	within one octave (!), of which only 211 are truly more harmonic than 0.03" ("Two Essays on 	Theory", C.Barlow (CMJ, 1987, see formula in highestPower method below).             */
-	minHarmonicityVector {|pitchRange = 1, maxPrime = 11|
+	within one octave (!), of which only 211 are truly more harmonic than 0.03" ("Two Essays on Theory", C.Barlow (CMJ, 1987, see formula in highestPower method below).             */
+
+  minHarmonicityVector {|pitchRange = 1, maxPrime = 11|
 	     ^Array.primes(maxPrime).collect{|p| p.highestPower(this, pitchRange)}
 	}
 
@@ -261,7 +265,6 @@ USAGE:  a_prime.primeHarmonics(highest_harmonic)
 		var mul = [this[0] * that[0], this[1] * that[1]];
 		if (reduce) {^mul.reduceRatio}{^mul}
 	}
-
 	ratioAdd {|that| var denom, sum;
 		if (this[1] != that[1]) {
 			denom = lcm(this[1],that[1]);
@@ -271,7 +274,8 @@ USAGE:  a_prime.primeHarmonics(highest_harmonic)
 			denom = this[1];
 		}
 		^[sum, denom].reduceRatio
-	}
+
+	} 
 
 	ratioSub {|that| var denom, diff;
 		if (this[1] != that[1]) {
@@ -283,7 +287,6 @@ USAGE:  a_prime.primeHarmonics(highest_harmonic)
 		};
 		^[diff, denom].reduceRatio
 	}
-
 
 	// express a rational as [p,q] where p and q are coprime:
 	reduceRatio { ^this div: (this[0] gcd: this[1]) }
